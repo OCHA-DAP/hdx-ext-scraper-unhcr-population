@@ -1,2 +1,11 @@
 # Collector specific configuration
 
+files:
+    asylum_applications: HDX_AsylumApplications.csv
+    asylum_decisions: HDX_AsylumDecisions.csv
+    demographics: HDX_Demographics.csv
+    end_year_population_totals: HDX_EndYearPopulationTotals.csv
+    solutions: HDX_Solutions.csv
+
+source_directory: tests/fixtures
+

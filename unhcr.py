@@ -70,7 +70,7 @@ WORLD = "world"
 
 
 def get_countriesdata(download_url, files, downloader):
-    countriesdata = {WORLD: {"iso3": WORLD, "countryname": WORLD}}
+    countriesdata = {WORLD: {"iso3": WORLD, "countryname": "World"}}
     countries = list()
     if not download_url.endswith("/"):
         download_url += "/"
@@ -116,7 +116,7 @@ def get_countriesdata(download_url, files, downloader):
                 countriesdata[countryiso][resource_name].append(row)
                 countriesdata[WORLD][resource_name].append(row)
         for country_name_column in reversed(country_name_columns):
-            headers.insert(2, country_name_column)
+            headers.insert(3, country_name_column)
         for resource_name in resource_names:
             all_headers[resource_name] = headers
     return countries, all_headers, countriesdata
@@ -146,6 +146,10 @@ def generate_dataset_and_showcase(folder, country, countrydata, headers):
         return {"startdate": startdate, "enddate": enddate}
 
     for resource_name, resource_rows in countrydata.items():
+        if countryiso == WORLD:  # refugees and asylants contain the same data for WORLD
+            if resource_name.endswith("asylants"):
+                continue
+            resource_name.replace("_refugees", "")
         filename = f"{resource_name}_%s.csv" % countryiso
         name = resource_name.replace("_", " ").capitalize()
         resourcedata = {
@@ -153,10 +157,10 @@ def generate_dataset_and_showcase(folder, country, countrydata, headers):
             "description": f"{name} data with HXL tags",
         }
 
-#        quickcharts = {
-#            "cutdown": 2,
-#            "cutdownhashtags": ["#date+year+end", "#adm1+name", "#affected+killed"],
-#        }
+        #        quickcharts = {
+        #            "cutdown": 2,
+        #            "cutdownhashtags": ["#date+year+end", "#adm1+name", "#affected+killed"],
+        #        }
         success, results = dataset.generate_resource_from_iterator(
             headers[resource_name],
             resource_rows,
@@ -165,18 +169,20 @@ def generate_dataset_and_showcase(folder, country, countrydata, headers):
             filename,
             resourcedata,
             date_function=process_dates,
- #           quickcharts=quickcharts,
+            #           quickcharts=quickcharts,
         )
 
         if success is False:
-            logger.warning(f'{countryname} - {name}  has no data!')
+            logger.warning(f"{countryname} - {name}  has no data!")
 
-    showcase = Showcase({
-        'name': '%s-showcase' % slugified_name,
-        'title': title,
-        'notes': 'UNHCR Population Data Dashboard for %s' % countryname,
-        'url': 'https://www.unhcr.org/refugee-statistics/',
-        'image_url': 'https://www.unhcr.org/assets/img/unhcr-logo.png'
-    })
+    showcase = Showcase(
+        {
+            "name": "%s-showcase" % slugified_name,
+            "title": title,
+            "notes": "UNHCR Population Data Dashboard for %s" % countryname,
+            "url": "https://www.unhcr.org/refugee-statistics/",
+            "image_url": "https://www.unhcr.org/assets/img/unhcr-logo.png",
+        }
+    )
     showcase.add_tags(tags)
     return dataset, showcase
