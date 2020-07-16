@@ -1,2 +1,12 @@
 # Collector specific configuration
 download_url: "https://www.dropbox.com/s/9z2q521dq2vs1dx/HDX_Sample.zip?dl=0"
+
+files:
+    asylum_applications: HDX_AsylumApplications.csv
+    asylum_decisions: HDX_AsylumDecisions.csv
+    demographics: HDX_Demographics.csv
+    end_year_population_totals: HDX_EndYearPopulationTotals.csv
+    solutions: HDX_Solutions.csv
+
+source_directory: tests/fixtures
+

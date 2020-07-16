@@ -2,7 +2,7 @@ license_id: "cc-by-igo"
 notes: "UNHCR dataset"
 caveats: ""
 methodology: "Other"
-methodology_other: ""
+methodology_other: "Other"
 dataset_source: "UNHCR"
 package_creator: "orest3.dubay@gmail.com"
 private: False  # has to be True or False
