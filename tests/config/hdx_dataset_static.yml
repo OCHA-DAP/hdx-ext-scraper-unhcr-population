@@ -1,0 +1,16 @@
+license_id: "cc-by-sa"
+subnational: 1  # has to be 0 or 1. Default 1 for ACLED.
+notes: "The ACLED project codes reported information on the type, agents, exact location, date, and other characteristics of political violence events, demonstrations and select politically relevant non-violent events. ACLED focuses on tracking a range of violent and non-violent actions by political agents, including governments, rebels, militias, communal groups, political parties, external actors, rioters, protesters and civilians. Data contain specific information on the date, location, group names, interaction type, event type, reported fatalities and contextual notes."
+caveats: "ACLED has several rules about fatalities numbers, sourcing and reporting.
+1. ACLED does not have a fatality threshold for event inclusion. This means that conflict and demonstration events in ACLED do not have to produce any fatalities in order to be included as a valid event. We use no arbitrary number of deaths to define a conflict.
+2. ACLED reports fatalities only when a reputable source has relayed that information. Further, researchers seek out information to triangulate – where and when possible – the numbers from any report.
+3. ACLED uses the most conservative estimate available, and will revise and correct the totals – upward or downward – when better information comes available.
+
+ACLED advises caution in using all fatality numbers from its, or any other conflict data source. Fatality information is the most biased, and least accurate, part of any conflict report and extreme caution should be employed when using any fatality number to show patterns."
+methodology: "Other"
+methodology_other: "This page contains information about how the ACLED team collects, cleans, reviews and checks event data, with a focus on what makes ACLED unique and compatible with other data. The process of ACLED coding assures that it is accurate, comprehensive, transparent and regularly updated. Data are posted as they are complete, although there are ongoing checks to ensure the thoroughness of previously collected events. For more information, please consult [ACLED's Methodology page](https://www.acleddata.com/resources/methodology/)."
+dataset_source: "ACLED"
+package_creator: "mcarans"
+private: False  # has to be True or False
+url: ~
+state: "active"  # always "active".
