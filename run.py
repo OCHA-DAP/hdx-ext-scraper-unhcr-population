@@ -26,13 +26,14 @@ def main():
     """Generate dataset and create it in HDX"""
 
     configuration = Configuration.read()
-    files = configuration["files"]
+    resources = configuration["resources"]
+    fields = configuration["fields"]
     source_directory = configuration["source_directory"]
     download_url = Path(source_directory).resolve().as_uri()
 
     with Download() as downloader:
         countries, headers, countriesdata = get_countriesdata(
-            download_url, files, downloader
+            download_url, resources, downloader
         )
         logger.info("Number of countries: %d" % len(countriesdata))
         for info, country in progress_storing_tempdir(
@@ -41,7 +42,7 @@ def main():
             folder = info["folder"]
 
             dataset, showcase = generate_dataset_and_showcase(
-                folder, country, countriesdata[country["iso3"]], headers
+                folder, country, countriesdata[country["iso3"]], headers, resources, fields
             )
             if dataset:
                 dataset.update_from_yaml()

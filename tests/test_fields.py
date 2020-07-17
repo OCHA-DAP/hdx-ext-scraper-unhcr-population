@@ -5,6 +5,7 @@ from fields import (
     hxltags_mapping,
     add_decoded_fields_in_iterator,
     convert_fields_in_iterator,
+    convert_headers,
 )
 import yaml
 
@@ -109,4 +110,13 @@ fields:
                 "field2e": None,
                 "unspecified_field": "X2",
             },
+        ]
+
+    def test_convert_headers(self, fields):
+        new_headers = convert_headers(["field1", "field2", "unspecified_field"], fields)
+        assert new_headers == [
+            "field1 renamed",
+            "field2 renamed",
+            "field2e",
+            "unspecified_field",
         ]

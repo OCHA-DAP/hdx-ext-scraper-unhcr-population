@@ -1,3 +1,24 @@
+"""
+Utilities for using a "fields" structure to define hxl tags, rename fields and decode fields values.
+The fields structure looks is a dictionary that looks like this:
+  field1:
+    name: 'New name for field1'
+    tags: '#meta+tags+for+field1'
+  field2:
+    name: "New name for field2"
+    tags: '#indicator+code'
+    encoding:
+      name: "Field2 names"    # Name of the new field created out of field2 by applying the map
+      tags: '#indicator+name' # HXL tags for the new field
+      map:
+        f2val1: "field2 value 1 mapped"
+        f2val2: "field2 value 2 mapped"
+
+Use convert_fields_in_iterator to convert an iterator, hxltags_mapping to extract mapping of field names (new or old)
+and finally convert_headers to convert the headers.
+"""
+
+
 def rename_fields_in_iterator(iterator, fields):
     """Rename fields in iterator.
     Function expects an iterable of dictionaries and field description.
@@ -5,7 +26,9 @@ def rename_fields_in_iterator(iterator, fields):
     containing a "name" key with the value containing the new name for the field.
     """
     for row in iterator:
-        yield {fields.get(key, {}).get("name", key): value for key, value in row.items()}
+        yield {
+            fields.get(key, {}).get("name", key): value for key, value in row.items()
+        }
 
 
 def encoding(fields, use_original_field_names=False):
@@ -69,3 +92,16 @@ def convert_fields_in_iterator(iterator, fields):
         rename_fields_in_iterator(iterator, fields), encoding_map, encoding_field_names
     ):
         yield x
+
+
+def convert_headers(headers, fields):
+    "Rename and eventually add new fields into headers using the fields structure"
+    _, encoding_field_names = encoding(fields, use_original_field_names=True)
+
+    new_headers=[]
+    for field in headers:
+        new_headers.append(fields.get(field,{}).get("name",field))
+        if field in encoding_field_names:
+            new_headers.append(encoding_field_names[field])
+
+    return new_headers

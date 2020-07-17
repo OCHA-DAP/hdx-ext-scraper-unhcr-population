@@ -16,67 +16,22 @@ from hdx.location.country import Country
 from hdx.utilities.dictandlist import dict_of_lists_add
 from slugify import slugify
 from urllib.parse import urljoin
+from fields import convert_fields_in_iterator, convert_headers, hxltags_mapping
 
 logger = logging.getLogger(__name__)
-hxltags = {
-    "Year": "#date+year",
-    "ISO3CoO": "#country+code+iso+origin",
-    "ISO3CoA": "#country+code+iso+asylum",
-    "ProcedureType": "#action+procedure+code",
-    "ApplicationType": "#meta+application+kind+code",
-    "ApplicationDataType": "#meta+application+unit+code",
-    "ApplicationAveragePersonsPerCase": "#indicator+average+num+applications+percase",
-    "Applications": "#indicator+num+applications+total",
-    "DecisionType": "#meta+decision+code",
-    "DecisionDataType": "#meta+decision+unit+code",
-    "DecisionsAveragePersonsPerCase": "#indicator+average+num+decisions+percase",
-    "Recognized": "#population+recognized+num",
-    "RecognizedOther": "#population+recognized+other+num",
-    "OtherwiseClosed": "#population+otherwise+closed+num",
-    "Rejected": "#population+rejected+num",
-    "TotalDecided": "#population+total+decided+num",
-    "PT": "#meta+code+pt",
-    "location": "#loc",
-    "urbanRural": "#indicator+urban+rural",
-    "accommodationType": "#indicator+accomodation",
-    "Female_0_4": "#population+f+infants+num",
-    "Female_5_11": "#population+f+children+num",
-    "Female_12_17": "#population+f+adolescents+num",
-    "Female_18_59": "#population+f+adults+num",
-    "Female_60": "#population+f+elderly+num",
-    "Female_Unknown": "#population+f+unknown+num",
-    "Female_total": "#population+f+total+num",
-    "Male_0_4": "#population+m+infants+num",
-    "Male_5_11": "#population+m+children+num",
-    "Male_12_17": "#population+m+adolescents+num",
-    "Male_18_59": "#population+m+adults+num",
-    "Male_60": "#population+m+elderly+num",
-    "Male_Unknown": "#population+m+unknown+num",
-    "Male_total": "#population+m+total+num",
-    "Total": "#population+i+total+num",
-    "REF": "#indicator+num+ref",
-    "IDP": "#population+flow+num+idp",
-    "ASY": "#indicator+num+asy",
-    "OOC": "#indicator+num+ooc",
-    "STA": "#indicator+num+sta",
-    "VDA": "#indicator+num+vda",
-    "RST": "#indicator+num+rst",
-    "NAT": "#indicator+num+nat",
-    "RET": "#indicator+num+ret",
-    "RDP": "#population+refugees+total+num",
-}
 
 WORLD = "world"
 
 
-def get_countriesdata(download_url, files, downloader):
+def get_countriesdata(download_url, resources, downloader):
     countriesdata = {WORLD: {"iso3": WORLD, "countryname": "World"}}
     countries = list()
     if not download_url.endswith("/"):
         download_url += "/"
 
     all_headers = {}
-    for name, filename in files.items():
+    for name, record in resources.items():
+        filename = record["file"]
         specific_download_url = urljoin(download_url, filename)
         headers, iterator = downloader.get_tabular_rows(
             specific_download_url, headers=1, dict_form=True
@@ -90,7 +45,7 @@ def get_countriesdata(download_url, files, downloader):
         ]
         resource_names = [
             f"{name}_"
-            + dict(ISO3CoO="refugees", ISO3CoA="asylants").get(
+            + dict(ISO3CoO="originating", ISO3CoA="residing").get(
                 country_column, country_column
             )
             for country_column in country_columns
@@ -122,14 +77,14 @@ def get_countriesdata(download_url, files, downloader):
     return countries, all_headers, countriesdata
 
 
-def generate_dataset_and_showcase(folder, country, countrydata, headers):
+def generate_dataset_and_showcase(folder, country, countrydata, headers, resources, fields):
     """
     """
     countryiso = country["iso3"]
     countryname = country["countryname"]
-    title = "%s - Data on UNHCR population" % countryname
+    title = "%s  - Data on forcibly displaced populations and stateless persons, collated by UNHCR" % countryname
     logger.info("Creating dataset: %s" % title)
-    slugified_name = slugify("UNHCR Population Data for %s" % countryname).lower()
+    slugified_name = slugify("UNHCR Population Data for %s" % countryiso).lower()
     dataset = Dataset({"name": slugified_name, "title": title,})
     dataset.set_maintainer("196196be-6037-4488-8b71-d786adf4c081")
     dataset.set_organization("hdx")
@@ -146,15 +101,18 @@ def generate_dataset_and_showcase(folder, country, countrydata, headers):
         return {"startdate": startdate, "enddate": enddate}
 
     for resource_name, resource_rows in countrydata.items():
+        resource_id = "_".join(resource_name.split("_")[:-1])
+        originating_residing = resource_name.split("_")[-1] # originating or residing
+        record = resources[resource_id]
+
         if countryiso == WORLD:  # refugees and asylants contain the same data for WORLD
-            if resource_name.endswith("asylants"):
+            if originating_residing=="originating":
                 continue
-            resource_name.replace("_refugees", "")
-        filename = f"{resource_name}_%s.csv" % countryiso
-        name = resource_name.replace("_", " ").capitalize()
+        format_parameters = dict(countryiso=countryiso.lower(), countryname=countryname)
+        filename = f"{resource_name}_{countryiso}.csv"
         resourcedata = {
-            "name": f"{name} Data for {countryname}",
-            "description": f"{name} data with HXL tags",
+            "name": record[originating_residing]["title"].format(**format_parameters),
+            "description": record[originating_residing]["description"].format(**format_parameters),
         }
 
         #        quickcharts = {
@@ -162,9 +120,9 @@ def generate_dataset_and_showcase(folder, country, countrydata, headers):
         #            "cutdownhashtags": ["#date+year+end", "#adm1+name", "#affected+killed"],
         #        }
         success, results = dataset.generate_resource_from_iterator(
-            headers[resource_name],
-            resource_rows,
-            hxltags,
+            convert_headers(headers[resource_name], fields),
+            convert_fields_in_iterator(resource_rows, fields),
+            hxltags_mapping(fields),
             folder,
             filename,
             resourcedata,
