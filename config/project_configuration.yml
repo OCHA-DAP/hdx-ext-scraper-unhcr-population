@@ -8,5 +8,194 @@ files:
     end_year_population_totals: HDX_EndYearPopulationTotals.csv
     solutions: HDX_Solutions.csv
 
-source_directory: tests/fixtures
+source_directory: data
+
+fields:
+  ASY:
+    name: Asylum-seekers
+    tags: '#indicator+num+value+asylum_seeker'
+  AccommodationType:
+    name: Accommodation Type
+    tags: '#indicator+accommodation'
+  ApplicationAveragePersonsPerCase:
+    name: Application Average Persons Per Case
+    tags: '#indicator+average+num+value+applications+percase'
+  ApplicationDataType:
+    name: Application Data Type
+    tags: '#meta+application+unit+code'
+    encoding:
+      name: Application Data
+      tags: '#meta+application+unit+name'
+      map:
+        C: Cases
+        P: Persons
+  ApplicationType:
+    name: Application Type Code
+    tags: '#meta+application+kind+code'
+    encoding:
+      name: Application Type
+      tags: '#meta+application+kind+name'
+      map:
+        N:  New
+        R:  Repeat
+        A:  Appeal
+        NA: New and appeal
+        NR: New and repeat
+        FA: First and appeal
+        J:  Judiciary
+        BL: Backlog 
+        SP: Subsidiary protection
+  Applications:
+    name: Number of Applications
+    tags: '#indicator+num+value+applications+total'
+  DecisionDataType:
+    name: Decision Data Type
+    tags: '#meta+decision+unit+code'
+    encoding:
+      name: Decision Data
+      tags: '#meta+decision+unit+name'
+      map:
+        C: Cases
+        P: Persons
+  DecisionType:
+    name: Decision Type Code
+    tags: '#meta+decision+code'
+    encoding:
+      expand: false
+      name: Decision Type
+      tags: '#meta+decision+name'
+      map:
+         NA: New Applications
+         FI: First instance decisions
+         AR: Administrative Review decisions
+         RA: Repeat/reopened applications
+         IN: US Citizenship and Immigration Services
+         EO: US Executive Office of Immigration Review
+         JR: Judicial Review
+         SP: Subsidiary protection
+         FA: First instance and appeal
+         TP: Temporary protection
+         TA: Temporary asylum
+         BL: Backlog
+         TR: Temporary outside the asylum procedure
+         CA: Cantonal regulations in Switzerland
+  DecisionsAveragePersonsPerCase:
+    name: Decisions Average Persons Per Case
+    tags: '#indicator+average+num+value+decisions+percase'
+  Female_0_4:
+    name: Female 0-4
+    tags: '#population+f+infants+num+value'
+  Female_12_17:
+    name: Female 12-17
+    tags: '#population+f+adolescents+num+value'
+  Female_18_59:
+    name: Female 18-59
+    tags: '#population+f+adults+num+value'
+  Female_5_11:
+    name: Female 5-11
+    tags: '#population+f+children+num+value'
+  Female_60:
+    name: Female 60 or more
+    tags: '#population+f+elderly+num+value'
+  Female_Unknown:
+    name: Female Unknown
+    tags: '#population+f+unknown+num+value'
+  Female_total:
+    name: Female Total
+    tags: '#population+f+total+num+value'
+  IDP:
+    name: Internally Displaced Persons
+    tags: '#indicator+num+value+idp'
+  ISO3CoA:
+    name: Country of Asylum
+    tags: '#country+code+iso+asylum'
+  ISO3CoO:
+    name: Country of Origin
+    tags: '#country+code+iso+origin'
+  Location:
+    name: Location
+    tags: '#loc'
+  Male_0_4:
+    name: Male 0-4
+    tags: '#population+m+infants+num+value'
+  Male_12_17:
+    name: Male 12-17
+    tags: '#population+m+adolescents+num+value'
+  Male_18_59:
+    name: Male 18-59
+    tags: '#population+m+adults+num+value'
+  Male_5_11:
+    name: Male 5-11
+    tags: '#population+m+children+num+value'
+  Male_60:
+    name: Male 60 or more
+    tags: '#population+m+elderly+num+value'
+  Male_Unknown:
+    name: Male Unknown
+    tags: '#population+m+unknown+num+value'
+  Male_total:
+    name: Male Total
+    tags: '#population+m+total+num+value'
+  NAT:
+    name: Naturalisation
+    tags: '#indicator+num+value+naturalisation'
+  OOC:
+    name: Others of Concern to UNHCR
+    tags: '#indicator+num+value+others_of_concern'
+  OtherwiseClosed:
+    name: Otherwise Closed
+    tags: '#population+otherwise+closed+num+value'
+  PopulationType:
+    name: Population Type
+    tags: '#meta+code+population+type'
+  ProcedureType:
+    name: Procedure Type
+    tags: '#action+procedure+code'
+    encoding:
+      name: Procedure Name
+      tags: '#action+procedure+name'
+      map:
+        G: Government
+        U: UNHCR
+        J: Joint
+  RDP:
+    name: IDP returns
+    tags: '#indicator+num+value+returns+idp'
+  REF:
+    name: Refugees
+    tags: '#indicator+num+value+refugee'
+  RET:
+    name: Refugee returns
+    tags: '#indicator+num+value+returns+refugee'
+  RST:
+    name: Resettlement arrivals
+    tags: '#indicator+num+value+resettlement+arrivals'
+  Recognized:
+    name: Recognized
+    tags: '#population+recognized+num+value'
+  RecognizedOther:
+    name: Complementary Protection
+    tags: '#population+recognized+other+num+value'
+  Rejected:
+    name: Rejected
+    tags: '#population+rejected+num+value'
+  STA:
+    name: Stateless persons
+    tags: '#indicator+num+value+stateless'
+  Total:
+    name: Total
+    tags: '#population+i+total+num+value'
+  TotalDecided:
+    name: Total Decided
+    tags: '#population+total+decided+num+value'
+  UrbanRural:
+    name: Urban or Rural
+    tags: '#indicator+urban+rural'
+  VDA:
+    name: Venezuelans Displaced Abroad
+    tags: '#indicator+num+value+venezuelans+displaced+abroad'
+  Year:
+    name: Year
+    tags: '#date+year'
+
 
