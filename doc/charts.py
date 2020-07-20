@@ -14,7 +14,8 @@ from fields import convert_headers, convert_fields_in_iterator, hxltags_mapping
 import liquer.ext.basic
 import liquer.ext.meta
 import liquer.ext.lq_pandas
-import liquer.ext.lq_hxl
+
+# import liquer.ext.lq_hxl
 import liquer.ext.lq_python
 import liquer.ext.lq_pygments
 import yaml
@@ -43,36 +44,43 @@ def data_path():
 
 @first_command
 def config():
+    "Config data structure containing the field name conversions and hxl tags"
     return yaml.load(open("../config/project_configuration.yml"))
 
 
 @first_command
 def asylum_applications():
+    "Return raw asylum application data"
     return pd.read_csv(f"{data_path()}/HDX_AsylumApplications.csv")
 
 
 @first_command
 def asylum_decisions():
+    "Return raw asylum decision data"
     return pd.read_csv(f"{data_path()}/HDX_AsylumDecisions.csv")
 
 
 @first_command
 def demographics():
+    "Return raw demographic data"
     return pd.read_csv(f"{data_path()}/HDX_Demographics.csv")
 
 
 @first_command
 def population_totals():
+    "Return raw end year population totals data"
     return pd.read_csv(f"{data_path()}/HDX_EndYearPopulationTotals.csv")
 
 
 @first_command
 def solutions():
+    "Return raw solutions data"
     return pd.read_csv(f"{data_path()}/HDX_Solutions.csv")
 
 
 @first_command
 def countries():
+    "Table of countries (iso3 and country name) used in the data"
     countries = set()
     for data in [
         "asylum_applications",
@@ -93,6 +101,7 @@ def countries():
 
 @command
 def convert(df, add_hxltags=True):
+    "Rename fields and optionally add hxl tags"
     fields = config()["fields"]
     columns = convert_headers(df.columns, fields)
     mapping = hxltags_mapping(fields)
@@ -105,6 +114,9 @@ def convert(df, add_hxltags=True):
 
 
 def country_columns(df):
+    """Return two column names - ouuntry of origin and country of asylum.
+    Names of the columns depend on whether it is raw data or if the column names have been "converted". 
+    """
     fields = config()["fields"]
     coo = "ISO3CoO"
     coa = "ISO3CoA"
@@ -117,6 +129,9 @@ def country_columns(df):
 
 @command
 def filter_country(df, countryiso, country_of="originating"):
+    """Keep only rows for one country - originating or residing.
+    A column "Country" with column names of the variable country (residing or originating) is created.
+    """
     countries_table = evaluate(
         "countries"
     ).get()  # evaluate rather than call, so that the cache is used
@@ -133,12 +148,14 @@ def filter_country(df, countryiso, country_of="originating"):
 
 @command
 def totals_per(df, column="Country"):
+    "Group by a specific column and sum up each group (all numeric columns)"
     df = df.groupby([column]).sum().reset_index()
     return df.sort_values(by=column)
 
 
 @command
 def pie(df, values_column, names_column="Country"):
+    "Create a pie chart (plotly html)"
     return px.pie(
         df, values=values_column, names=names_column, width=600, height=400
     ).to_html(full_html=False, include_plotlyjs="cdn")
@@ -146,6 +163,7 @@ def pie(df, values_column, names_column="Country"):
 
 @command
 def bar(df, y_column, x_column="Year"):
+    "Create a bar chart (plotly html)"
     return px.bar(df, x=x_column, y=y_column, width=600, height=400).to_html(
         full_html=False, include_plotlyjs="cdn"
     )
@@ -153,6 +171,7 @@ def bar(df, y_column, x_column="Year"):
 
 @command
 def decision_bar(df, x_column="Country"):
+    "Create a bar chart for decision categories"
     return px.bar(
         df,
         x=str(x_column),
@@ -162,8 +181,36 @@ def decision_bar(df, x_column="Country"):
     ).to_html(full_html=False, include_plotlyjs="cdn")
 
 
+@command
+def demographics_bar(df, x_column="Country", detailed=False):
+    "Create a bar chart for demographics categories"
+    if detailed:
+        y = [
+            "Female 0-4",
+            "Female 5-11",
+            "Female 12-17",
+            "Female 18-59",
+            "Female 60 or more",
+            "Female Unknown",
+            "Male 0-4",
+            "Male 5-11",
+            "Male 12-17",
+            "Male 18-59",
+            "Male 60 or more",
+            "Male Unknown",
+        ]
+    else:
+        y = ["Female Total", "Male Total"]
+
+    "Create a bar chart for decision categories"
+    return px.bar(df, x=str(x_column), y=y, width=600, height=400,).to_html(
+        full_html=False, include_plotlyjs="cdn"
+    )
+
+
 @first_command
 def report_applications(countryiso):
+    "Create a report as html for asylum applications for a specific country"
     countries_table = evaluate(
         "countries"
     ).get()  # evaluate rather than call, so that the cache is used
@@ -211,6 +258,7 @@ def report_applications(countryiso):
 
 @first_command
 def report_decisions(countryiso):
+    "Create a report as html for asylum decisions for a specific country"
     countries_table = evaluate(
         "countries"
     ).get()  # evaluate rather than call, so that the cache is used
@@ -257,7 +305,82 @@ def report_decisions(countryiso):
 
 
 @first_command
+def report_demographics(countryiso):
+    "Create a report as html for demographics for a specific country"
+    countries_table = evaluate(
+        "countries"
+    ).get()  # evaluate rather than call, so that the cache is used
+    country_map = dict(zip(countries_table.iso3, countries_table.country))
+    country_name = country_map.get(countryiso)
+    return evaluate_template(
+        f"""
+<html>
+<head>
+  <title>Demographics - {country_name}</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+
+</head>
+
+<body>
+  <h1>Demographics - {country_name}</h1>
+
+  <div class="container">
+    <div class="row">
+      <div class="col-sm">
+        <h4>Demographics by country for refugees originating from {country_name}</h4>
+        $demographics/convert-f/filter_country-{countryiso}-originating/totals_per-Country/demographics_bar-Country-f$
+      </div>
+      <div class="col-sm">
+        <h4>Demographics by country for refugees residing in {country_name}</h4>
+        $demographics/convert-f/filter_country-{countryiso}-residing/totals_per-Country/demographics_bar-Country-f$
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm">
+        <h4>Demographics by year for refugees originating from {country_name}</h4>
+        $demographics/convert-f/filter_country-{countryiso}-originating/totals_per-Year/demographics_bar-Year-f$
+      </div>
+      <div class="col-sm">
+        <h4>Demographics by year for refugees residing in {country_name}</h4>
+        $demographics/convert-f/filter_country-{countryiso}-residing/totals_per-Year/demographics_bar-Year-f$
+      </div>
+    </div>
+  </div>
+
+  <h2>Detailed Demographics</h2>
+
+  <div class="container">
+    <div class="row">
+      <div class="col-sm">
+        <h4>Demographics by country for refugees originating from {country_name}</h4>
+        $demographics/convert-f/filter_country-{countryiso}-originating/totals_per-Country/demographics_bar-Country-t$
+      </div>
+      <div class="col-sm">
+        <h4>Demographics by country for refugees residing in {country_name}</h4>
+        $demographics/convert-f/filter_country-{countryiso}-residing/totals_per-Country/demographics_bar-Country-t$
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm">
+        <h4>Demographics by year for refugees originating from {country_name}</h4>
+        $demographics/convert-f/filter_country-{countryiso}-originating/totals_per-Year/demographics_bar-Year-t$
+      </div>
+      <div class="col-sm">
+        <h4>Demographics by year for refugees residing in {country_name}</h4>
+        $demographics/convert-f/filter_country-{countryiso}-residing/totals_per-Year/demographics_bar-Year-t$
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
+    """
+    )
+
+
+@first_command
 def reports():
+    "Table of all reports for all countries"
     countries_table = evaluate(
         "countries"
     ).get()  # evaluate rather than call, so that the cache is used
@@ -268,7 +391,8 @@ def reports():
       <td>{row.iso3}</td>
       <td>
       <a href="/liquer/q/report_applications-{row.iso3}/applications_{row.iso3}.html">applications</a>,
-      <a href="/liquer/q/report_decisions-{row.iso3}/applications_{row.iso3}.html">decisions</a>
+      <a href="/liquer/q/report_decisions-{row.iso3}/decisions_{row.iso3}.html">decisions</a>,
+      <a href="/liquer/q/report_demographics-{row.iso3}/demographics_{row.iso3}.html">demographics</a>
       </td>
     </tr>"""
         for index, row in countries_table.iterrows()
@@ -302,6 +426,7 @@ def reports():
 
 
 def add_menuitem(title, subtitle, link):
+    "Convinience function for creating menus"
     menu = get_vars().get("menu", [])
     try:
         item_number = [i for i, item in enumerate(menu) if item["title"] == title][0]
@@ -333,17 +458,17 @@ add_menuitem(
 add_menuitem("Solutions", "Solutions raw data", "solutions")
 add_menuitem("Solutions", "Solutions raw data", "solutions/convert")
 
-add_menuitem(
-    "Help", "Repository", "https://github.com/orest-d/hdx-scraper-unhcr-population"
-)
-add_menuitem("Help", "Commands", "ns-meta/flat_commands_nodoc/to_df")
-add_menuitem("Help", "LiQuer Homepage", "https://orest-d.github.io/liquer/")
+# add_menuitem(
+#    "Help", "Repository", "https://github.com/orest-d/hdx-scraper-unhcr-population"
+# )
+# add_menuitem("Help", "Commands", "ns-meta/flat_commands_nodoc/to_df")
+# add_menuitem("Help", "LiQuer Homepage", "https://orest-d.github.io/liquer/")
 
 
 @app.route("/", methods=["GET", "POST"])
 @app.route("/index.html", methods=["GET", "POST"])
 def index():
-    """Link to a LiQuer main service page"""
+    """Redirect to a LiQuer web-application page"""
     return redirect("/liquer/static/index.html")
 
 
