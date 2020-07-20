@@ -133,6 +133,11 @@ def bar(df, y_column, x_column="Year"):
     return px.bar(df, x=x_column, y=y_column, width=600, height=400
     ).to_html(full_html=False, include_plotlyjs="cdn")
 
+@command
+def decision_bar(df, x_column="Country"):
+    return px.bar(df, x=str(x_column), y=["Recognized", "Complementary Protection", "Otherwise Closed", "Rejected"], width=600, height=400
+    ).to_html(full_html=False, include_plotlyjs="cdn")
+
 @first_command
 def report_applications(countryiso):
     countries_table = evaluate("countries").get() # evaluate rather than call, so that the cache is used
@@ -170,8 +175,48 @@ def report_applications(countryiso):
         $asylum_applications/convert-f/filter_country-{countryiso}-residing/totals_per-Year/bar-Number~.of~.Applications$
       </div>
     </div>
+  </div>
+</body>
+</html>
+    """)
 
-    
+@first_command
+def report_decisions(countryiso):
+    countries_table = evaluate("countries").get() # evaluate rather than call, so that the cache is used
+    country_map = dict(zip(countries_table.iso3, countries_table.country))
+    country_name = country_map.get(countryiso)
+    return evaluate_template(f"""
+<html>
+<head>
+  <title>Asylum Decisions - {country_name}</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+
+</head>
+
+<body>
+  <h1>Asylum Decisions - {country_name}</h1>
+
+  <div class="container">
+    <div class="row">
+      <div class="col-sm">
+        <h4>Decisions by country for refugees originating from {country_name}</h4>
+        $asylum_decisions/convert-f/filter_country-{countryiso}-originating/totals_per-Country/decision_bar-Country$
+      </div>
+      <div class="col-sm">
+        <h4>Decisions by country for refugees residing in {country_name}</h4>
+        $asylum_decisions/convert-f/filter_country-{countryiso}-residing/totals_per-Country/decision_bar-Country$
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm">
+        <h4>Decisions by year for refugees originating from {country_name}</h4>
+        $asylum_decisions/convert-f/filter_country-{countryiso}-originating/totals_per-Year/decision_bar-Year$
+      </div>
+      <div class="col-sm">
+        <h4>Decisions by year for refugees residing in {country_name}</h4>
+        $asylum_decisions/convert-f/filter_country-{countryiso}-residing/totals_per-Year/decision_bar-Year$
+      </div>
+    </div>
   </div>
 </body>
 </html>
@@ -186,7 +231,8 @@ f"""    <tr>
       <th>{row.country}</th>
       <td>{row.iso3}</td>
       <td>
-      <a href="/liquer/q/report_applications-{row.iso3}/applications_{row.iso3}.html">applications</a>
+      <a href="/liquer/q/report_applications-{row.iso3}/applications_{row.iso3}.html">applications</a>,
+      <a href="/liquer/q/report_decisions-{row.iso3}/applications_{row.iso3}.html">decisions</a>
       </td>
     </tr>""" for index, row in countries_table.iterrows())
 
@@ -226,8 +272,8 @@ def add_menuitem(title, subtitle, link):
     menu[item_number]["items"].append(dict(title=subtitle, link=link))
     set_var("menu", menu)
 
-add_menuitem("Reports", "Countries", "countries")
 add_menuitem("Reports", "Reports by Country", "reports/reports_by_country.html")
+add_menuitem("Reports", "Countries", "countries")
 add_menuitem("Asylum Applications", "Asylum applications raw data", "asylum_applications")
 add_menuitem("Asylum Applications", "Asylum applications", "asylum_applications/convert")
 add_menuitem("Asylum Decisions", "Asylum decisions raw data", "asylum_decisions")
