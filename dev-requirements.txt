@@ -5,6 +5,6 @@ pandas>=1.0.0
 pandas_ods_reader
 liquer-framework>=0.3.1
 matplotlib
-plotly
+plotly==4.9.0
 pygments
 xlsxwriter
