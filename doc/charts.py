@@ -154,6 +154,12 @@ def totals_per(df, column="Country"):
 
 
 @command
+def last_year(df):
+    "Only keep the last year in the data"
+    return df.loc[df.Year == df.Year.max(), :]
+
+
+@command
 def pie(df, values_column, names_column="Country"):
     "Create a pie chart (plotly html)"
     return px.pie(
@@ -206,6 +212,25 @@ def demographics_bar(df, x_column="Country", detailed=False):
     return px.bar(df, x=str(x_column), y=y, width=600, height=400,).to_html(
         full_html=False, include_plotlyjs="cdn"
     )
+
+
+@command
+def population_bar(df, x_column="Country"):
+    "Create a bar chart for population totals categories"
+    return px.bar(
+        df,
+        x=str(x_column),
+        y=[
+            "Refugees",
+            "Internally Displaced Persons",
+            "Asylum-seekers",
+            "Others of Concern to UNHCR",
+            "Stateless persons",
+            "Venezuelans Displaced Abroad",
+        ],
+        width=600,
+        height=400,
+    ).to_html(full_html=False, include_plotlyjs="cdn")
 
 
 @first_command
@@ -379,6 +404,54 @@ def report_demographics(countryiso):
 
 
 @first_command
+def report_population_totals(countryiso):
+    "Create a report as html for population totals for a specific country"
+    countries_table = evaluate(
+        "countries"
+    ).get()  # evaluate rather than call, so that the cache is used
+    country_map = dict(zip(countries_table.iso3, countries_table.country))
+    country_name = country_map.get(countryiso)
+    return evaluate_template(
+        f"""
+<html>
+<head>
+  <title>Population Totals - {country_name}</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+
+</head>
+
+<body>
+  <h1>Population Totals - {country_name}</h1>
+
+  <div class="container">
+    <div class="row">
+      <div class="col-sm">
+        <h4>Last year population totals - refuges originating from {country_name}</h4>
+        $population_totals/convert-f/filter_country-{countryiso}-originating/last_year/totals_per-Country/population_bar-Country$
+      </div>
+      <div class="col-sm">
+        <h4>Last year population totals - refugees residing in {country_name}</h4>
+        $population_totals/convert-f/filter_country-{countryiso}-residing/last_year/totals_per-Country/population_bar-Country$
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm">
+        <h4>Population totals by year for refugees originating from {country_name}</h4>
+        $population_totals/convert-f/filter_country-{countryiso}-originating/totals_per-Year/population_bar-Year$
+      </div>
+      <div class="col-sm">
+        <h4>Population totals by year for refugees residing in {country_name}</h4>
+        $population_totals/convert-f/filter_country-{countryiso}-residing/totals_per-Year/population_bar-Year$
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+    """
+    )
+
+
+@first_command
 def reports():
     "Table of all reports for all countries"
     countries_table = evaluate(
@@ -392,7 +465,8 @@ def reports():
       <td>
       <a href="/liquer/q/report_applications-{row.iso3}/applications_{row.iso3}.html">applications</a>,
       <a href="/liquer/q/report_decisions-{row.iso3}/decisions_{row.iso3}.html">decisions</a>,
-      <a href="/liquer/q/report_demographics-{row.iso3}/demographics_{row.iso3}.html">demographics</a>
+      <a href="/liquer/q/report_demographics-{row.iso3}/demographics_{row.iso3}.html">demographics</a>,
+      <a href="/liquer/q/report_population_totals-{row.iso3}/population_totals_{row.iso3}.html">population totals</a>
       </td>
     </tr>"""
         for index, row in countries_table.iterrows()
