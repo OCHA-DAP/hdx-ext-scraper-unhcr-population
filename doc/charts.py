@@ -33,11 +33,13 @@ app.register_blueprint(bp.app, url_prefix=url_prefix)
 set_var("api_path", url_prefix + "/q/")
 set_var("server", "http://localhost:5000")
 
+
 def data_path():
     if os.path.exists("../data/HDX_AsylumApplications.csv"):
         return "../data"
     else:
         return "../tests/fixtures"
+
 
 @first_command
 def config():
@@ -72,14 +74,20 @@ def solutions():
 @first_command
 def countries():
     countries = set()
-    for data in ["asylum_applications", "asylum_decisions", "demographics",
-"population_totals",
-"solutions"]:
+    for data in [
+        "asylum_applications",
+        "asylum_decisions",
+        "demographics",
+        "population_totals",
+        "solutions",
+    ]:
         df = evaluate(data).get()
         countries.update(df.ISO3CoO)
         countries.update(df.ISO3CoA)
     countries = sorted(countries)
-    countrynames = [Country.get_country_name_from_iso3(countryiso) for countryiso in countries]
+    countrynames = [
+        Country.get_country_name_from_iso3(countryiso) for countryiso in countries
+    ]
     return pd.DataFrame(dict(iso3=countries, country=countrynames))
 
 
@@ -89,11 +97,12 @@ def convert(df, add_hxltags=True):
     columns = convert_headers(df.columns, fields)
     mapping = hxltags_mapping(fields)
     if add_hxltags:
-        hxltags = [{c:mapping.get(c,"") for c in columns}]
+        hxltags = [{c: mapping.get(c, "") for c in columns}]
     else:
         hxltags = []
-    data = hxltags+list(convert_fields_in_iterator(df.to_dict("records"), fields))
+    data = hxltags + list(convert_fields_in_iterator(df.to_dict("records"), fields))
     return pd.DataFrame(data, columns=columns)
+
 
 def country_columns(df):
     fields = config()["fields"]
@@ -105,45 +114,63 @@ def country_columns(df):
         coa = convert_headers([coa], fields)[0]
     return coo, coa
 
+
 @command
 def filter_country(df, countryiso, country_of="originating"):
-    countries_table = evaluate("countries").get() # evaluate rather than call, so that the cache is used
+    countries_table = evaluate(
+        "countries"
+    ).get()  # evaluate rather than call, so that the cache is used
     country_map = dict(zip(countries_table.iso3, countries_table.country))
     coo, coa = country_columns(df)
     is_originating = country_of.lower().startswith("o")
-    
+
     fixed_country_column = coo if is_originating else coa
     variable_country_column = coa if is_originating else coo
-    df = df.loc[df[fixed_country_column]==countryiso, :]
-    df["Country"]=[country_map.get(c, "") for c in df[variable_country_column]]
+    df = df.loc[df[fixed_country_column] == countryiso, :]
+    df["Country"] = [country_map.get(c, "") for c in df[variable_country_column]]
     return df
+
 
 @command
 def totals_per(df, column="Country"):
     df = df.groupby([column]).sum().reset_index()
     return df.sort_values(by=column)
 
+
 @command
 def pie(df, values_column, names_column="Country"):
-    return px.pie(df, values=values_column, names=names_column, width=600, height=400
+    return px.pie(
+        df, values=values_column, names=names_column, width=600, height=400
     ).to_html(full_html=False, include_plotlyjs="cdn")
+
 
 @command
 def bar(df, y_column, x_column="Year"):
-    return px.bar(df, x=x_column, y=y_column, width=600, height=400
-    ).to_html(full_html=False, include_plotlyjs="cdn")
+    return px.bar(df, x=x_column, y=y_column, width=600, height=400).to_html(
+        full_html=False, include_plotlyjs="cdn"
+    )
+
 
 @command
 def decision_bar(df, x_column="Country"):
-    return px.bar(df, x=str(x_column), y=["Recognized", "Complementary Protection", "Otherwise Closed", "Rejected"], width=600, height=400
+    return px.bar(
+        df,
+        x=str(x_column),
+        y=["Recognized", "Complementary Protection", "Otherwise Closed", "Rejected"],
+        width=600,
+        height=400,
     ).to_html(full_html=False, include_plotlyjs="cdn")
+
 
 @first_command
 def report_applications(countryiso):
-    countries_table = evaluate("countries").get() # evaluate rather than call, so that the cache is used
+    countries_table = evaluate(
+        "countries"
+    ).get()  # evaluate rather than call, so that the cache is used
     country_map = dict(zip(countries_table.iso3, countries_table.country))
     country_name = country_map.get(countryiso)
-    return evaluate_template(f"""
+    return evaluate_template(
+        f"""
 <html>
 <head>
   <title>Asylum Applications - {country_name}</title>
@@ -178,14 +205,19 @@ def report_applications(countryiso):
   </div>
 </body>
 </html>
-    """)
+    """
+    )
+
 
 @first_command
 def report_decisions(countryiso):
-    countries_table = evaluate("countries").get() # evaluate rather than call, so that the cache is used
+    countries_table = evaluate(
+        "countries"
+    ).get()  # evaluate rather than call, so that the cache is used
     country_map = dict(zip(countries_table.iso3, countries_table.country))
     country_name = country_map.get(countryiso)
-    return evaluate_template(f"""
+    return evaluate_template(
+        f"""
 <html>
 <head>
   <title>Asylum Decisions - {country_name}</title>
@@ -220,21 +252,27 @@ def report_decisions(countryiso):
   </div>
 </body>
 </html>
-    """)
+    """
+    )
+
 
 @first_command
 def reports():
-    countries_table = evaluate("countries").get() # evaluate rather than call, so that the cache is used
+    countries_table = evaluate(
+        "countries"
+    ).get()  # evaluate rather than call, so that the cache is used
     country_map = dict(zip(countries_table.iso3, countries_table.country))
-    rows="".join(
-f"""    <tr>
+    rows = "".join(
+        f"""    <tr>
       <th>{row.country}</th>
       <td>{row.iso3}</td>
       <td>
       <a href="/liquer/q/report_applications-{row.iso3}/applications_{row.iso3}.html">applications</a>,
       <a href="/liquer/q/report_decisions-{row.iso3}/applications_{row.iso3}.html">decisions</a>
       </td>
-    </tr>""" for index, row in countries_table.iterrows())
+    </tr>"""
+        for index, row in countries_table.iterrows()
+    )
 
     return f"""
 <html>
@@ -262,6 +300,7 @@ f"""    <tr>
 </html>
     """
 
+
 def add_menuitem(title, subtitle, link):
     menu = get_vars().get("menu", [])
     try:
@@ -272,16 +311,25 @@ def add_menuitem(title, subtitle, link):
     menu[item_number]["items"].append(dict(title=subtitle, link=link))
     set_var("menu", menu)
 
+
 add_menuitem("Reports", "Reports by Country", "reports/reports_by_country.html")
 add_menuitem("Reports", "Countries", "countries")
-add_menuitem("Asylum Applications", "Asylum applications raw data", "asylum_applications")
-add_menuitem("Asylum Applications", "Asylum applications", "asylum_applications/convert")
+add_menuitem(
+    "Asylum Applications", "Asylum applications raw data", "asylum_applications"
+)
+add_menuitem(
+    "Asylum Applications", "Asylum applications", "asylum_applications/convert"
+)
 add_menuitem("Asylum Decisions", "Asylum decisions raw data", "asylum_decisions")
 add_menuitem("Asylum Decisions", "Asylum decisions", "asylum_decisions/convert")
 add_menuitem("Demographics", "Demographics raw data", "demographics")
 add_menuitem("Demographics", "Demographics", "demographics/convert")
-add_menuitem("Population Totals", "End Year Population Totals raw data", "population_totals")
-add_menuitem("Population Totals", "End Year Population Totals", "population_totals/convert")
+add_menuitem(
+    "Population Totals", "End Year Population Totals raw data", "population_totals"
+)
+add_menuitem(
+    "Population Totals", "End Year Population Totals", "population_totals/convert"
+)
 add_menuitem("Solutions", "Solutions raw data", "solutions")
 add_menuitem("Solutions", "Solutions raw data", "solutions/convert")
 
