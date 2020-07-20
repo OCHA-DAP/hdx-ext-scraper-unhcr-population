@@ -145,22 +145,22 @@ fields:
     tags: '#indicator+average+num+value+decisions+percase'
   Female_0_4:
     name: Female 0-4
-    tags: '#population+f+infants+num+value'
+    tags: '#population+f+infants+age0_4+num+value'
   Female_12_17:
     name: Female 12-17
-    tags: '#population+f+adolescents+num+value'
+    tags: '#population+f+adolescents+age12_17+num+value'
   Female_18_59:
     name: Female 18-59
-    tags: '#population+f+adults+num+value'
+    tags: '#population+f+adults+num+age18_59+value'
   Female_5_11:
     name: Female 5-11
-    tags: '#population+f+children+num+value'
+    tags: '#population+f+children+age5_11+num+value'
   Female_60:
     name: Female 60 or more
-    tags: '#population+f+elderly+num+value'
+    tags: '#population+f+elderly+age60plus+num+value'
   Female_Unknown:
     name: Female Unknown
-    tags: '#population+f+unknown+num+value'
+    tags: '#population+f+ageunknown+num+value'
   Female_total:
     name: Female Total
     tags: '#population+f+total+num+value'
@@ -178,22 +178,22 @@ fields:
     tags: '#loc'
   Male_0_4:
     name: Male 0-4
-    tags: '#population+m+infants+num+value'
+    tags: '#population+m+infants+age0_4+num+value'
   Male_12_17:
     name: Male 12-17
-    tags: '#population+m+adolescents+num+value'
+    tags: '#population+m+adolescents+age12_17+num+value'
   Male_18_59:
     name: Male 18-59
-    tags: '#population+m+adults+num+value'
+    tags: '#population+m+adults+age18_59+num+value'
   Male_5_11:
     name: Male 5-11
-    tags: '#population+m+children+num+value'
+    tags: '#population+m+children+age5_11+num+value'
   Male_60:
     name: Male 60 or more
-    tags: '#population+m+elderly+num+value'
+    tags: '#population+m+elderly+age60plus+num+value'
   Male_Unknown:
     name: Male Unknown
-    tags: '#population+m+unknown+num+value'
+    tags: '#population+m+ageunknown+num+value'
   Male_total:
     name: Male Total
     tags: '#population+m+total+num+value'
