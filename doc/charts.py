@@ -162,6 +162,10 @@ def last_year(df):
 @command
 def pie(df, values_column, names_column="Country"):
     "Create a pie chart (plotly html)"
+    assert values_column in df.columns
+    assert names_column in df.columns
+    if len(df) == 0:
+        return f'<div class="alert alert-warning" role="alert">No data</div>'
     return px.pie(
         df, values=values_column, names=names_column, width=600, height=400
     ).to_html(full_html=False, include_plotlyjs="cdn")
@@ -170,6 +174,12 @@ def pie(df, values_column, names_column="Country"):
 @command
 def bar(df, y_column, x_column="Year"):
     "Create a bar chart (plotly html)"
+    if x_column not in df.columns:
+        return f'<div class="alert alert-warning" role="alert">{x_column} not in dataframe</div>'
+    if y_column not in df.columns:
+        return f'<div class="alert alert-warning" role="alert">{y_column} not in dataframe</div>'
+    if len(df) == 0:
+        return f'<div class="alert alert-warning" role="alert">No data</div>'
     return px.bar(df, x=x_column, y=y_column, width=600, height=400).to_html(
         full_html=False, include_plotlyjs="cdn"
     )
@@ -178,13 +188,18 @@ def bar(df, y_column, x_column="Year"):
 @command
 def decision_bar(df, x_column="Country"):
     "Create a bar chart for decision categories"
-    return px.bar(
-        df,
-        x=str(x_column),
-        y=["Recognized", "Complementary Protection", "Otherwise Closed", "Rejected"],
-        width=600,
-        height=400,
-    ).to_html(full_html=False, include_plotlyjs="cdn")
+    y = ["Recognized", "Complementary Protection", "Otherwise Closed", "Rejected"]
+    y = [c for c in y if c in df.columns]
+    if x_column not in df.columns:
+        return f'<div class="alert alert-warning" role="alert">{x_column} not in dataframe</div>'
+    if len(y) == 0:
+        return f'<div class="alert alert-warning" role="alert">Decision category columns missing</div>'
+    if len(df) == 0:
+        return f'<div class="alert alert-warning" role="alert">No data</div>'
+
+    return px.bar(df, x=str(x_column), y=y, width=600, height=400,).to_html(
+        full_html=False, include_plotlyjs="cdn"
+    )
 
 
 @command
@@ -207,6 +222,13 @@ def demographics_bar(df, x_column="Country", detailed=False):
         ]
     else:
         y = ["Female Total", "Male Total"]
+    y = [c for c in y if c in df.columns]
+    if x_column not in df.columns:
+        return f'<div class="alert alert-warning" role="alert">{x_column} not in dataframe</div>'
+    if len(y) == 0:
+        return f'<div class="alert alert-warning" role="alert">Demographics category columns missing</div>'
+    if len(df) == 0:
+        return f'<div class="alert alert-warning" role="alert">No data</div>'
 
     "Create a bar chart for decision categories"
     return px.bar(df, x=str(x_column), y=y, width=600, height=400,).to_html(
@@ -217,6 +239,8 @@ def demographics_bar(df, x_column="Country", detailed=False):
 @command
 def population_bar(df, x_column="Country"):
     "Create a bar chart for population totals categories"
+    if len(df) == 0:
+        return f'<div class="alert alert-warning" role="alert">No data</div>'
     return px.bar(
         df,
         x=str(x_column),
@@ -228,6 +252,20 @@ def population_bar(df, x_column="Country"):
             "Stateless persons",
             "Venezuelans Displaced Abroad",
         ],
+        width=600,
+        height=400,
+    ).to_html(full_html=False, include_plotlyjs="cdn")
+
+
+@command
+def solutions_bar(df, x_column="Country"):
+    "Create a bar chart for solutions categories"
+    if len(df) == 0:
+        return f'<div class="alert alert-warning" role="alert">No data</div>'
+    return px.bar(
+        df,
+        x=str(x_column),
+        y=["Resettlement arrivals", "Naturalisation", "Refugee returns", "IDP returns"],
         width=600,
         height=400,
     ).to_html(full_html=False, include_plotlyjs="cdn")
@@ -452,6 +490,54 @@ def report_population_totals(countryiso):
 
 
 @first_command
+def report_solutions(countryiso):
+    "Create a report as html for solutions for a specific country"
+    countries_table = evaluate(
+        "countries"
+    ).get()  # evaluate rather than call, so that the cache is used
+    country_map = dict(zip(countries_table.iso3, countries_table.country))
+    country_name = country_map.get(countryiso)
+    return evaluate_template(
+        f"""
+<html>
+<head>
+  <title>Solutions - {country_name}</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+
+</head>
+
+<body>
+  <h1>Solutions - {country_name}</h1>
+
+  <div class="container">
+    <div class="row">
+      <div class="col-sm">
+        <h4>Solutions by country for refugees originating from {country_name}</h4>
+        $solutions/convert-f/filter_country-{countryiso}-originating/totals_per-Country/solutions_bar-Country$
+      </div>
+      <div class="col-sm">
+        <h4>Solutions by country for refugees residing in {country_name}</h4>
+        $solutions/convert-f/filter_country-{countryiso}-residing/totals_per-Country/solutions_bar-Country$
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm">
+        <h4>Solutions by year for refugees originating from {country_name}</h4>
+        $solutions/convert-f/filter_country-{countryiso}-originating/totals_per-Year/solutions_bar-Year$
+      </div>
+      <div class="col-sm">
+        <h4>Solutions by year for refugees residing in {country_name}</h4>
+        $solutions/convert-f/filter_country-{countryiso}-residing/totals_per-Year/solutions_bar-Year$
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+    """
+    )
+
+
+@first_command
 def reports():
     "Table of all reports for all countries"
     countries_table = evaluate(
@@ -466,7 +552,8 @@ def reports():
       <a href="/liquer/q/report_applications-{row.iso3}/applications_{row.iso3}.html">applications</a>,
       <a href="/liquer/q/report_decisions-{row.iso3}/decisions_{row.iso3}.html">decisions</a>,
       <a href="/liquer/q/report_demographics-{row.iso3}/demographics_{row.iso3}.html">demographics</a>,
-      <a href="/liquer/q/report_population_totals-{row.iso3}/population_totals_{row.iso3}.html">population totals</a>
+      <a href="/liquer/q/report_population_totals-{row.iso3}/population_totals_{row.iso3}.html">population totals</a>,
+      <a href="/liquer/q/report_solutions-{row.iso3}/solutions_{row.iso3}.html">solutions</a>
       </td>
     </tr>"""
         for index, row in countries_table.iterrows()
@@ -530,7 +617,7 @@ add_menuitem(
     "Population Totals", "End Year Population Totals", "population_totals/convert"
 )
 add_menuitem("Solutions", "Solutions raw data", "solutions")
-add_menuitem("Solutions", "Solutions raw data", "solutions/convert")
+add_menuitem("Solutions", "Solutions", "solutions/convert")
 
 # add_menuitem(
 #    "Help", "Repository", "https://github.com/orest-d/hdx-scraper-unhcr-population"
