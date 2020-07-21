@@ -294,12 +294,12 @@ def report_applications(countryiso):
   <div class="container">
     <div class="row">
       <div class="col-sm">
-        <h4>Applications by country for refugees originating from {country_name}</h4>
-        $asylum_applications/convert-f/filter_country-{countryiso}-originating/totals_per-Country/pie-Number~.of~.Applications$
+        <h4>Last year applications by country for refugees originating from {country_name}</h4>
+        $asylum_applications/convert-f/filter_country-{countryiso}-originating/last_year/totals_per-Country/pie-Number~.of~.Applications$
       </div>
       <div class="col-sm">
-        <h4>Applications by country for refugees residing in {country_name}</h4>
-        $asylum_applications/convert-f/filter_country-{countryiso}-residing/totals_per-Country/pie-Number~.of~.Applications$
+        <h4>Last year applications by country for refugees residing in {country_name}</h4>
+        $asylum_applications/convert-f/filter_country-{countryiso}-residing/last_year/totals_per-Country/pie-Number~.of~.Applications$
       </div>
     </div>
     <div class="row">
@@ -342,12 +342,12 @@ def report_decisions(countryiso):
   <div class="container">
     <div class="row">
       <div class="col-sm">
-        <h4>Decisions by country for refugees originating from {country_name}</h4>
-        $asylum_decisions/convert-f/filter_country-{countryiso}-originating/totals_per-Country/decision_bar-Country$
+        <h4>Last year decisions by country for refugees originating from {country_name}</h4>
+        $asylum_decisions/convert-f/filter_country-{countryiso}-originating/last_year/totals_per-Country/decision_bar-Country$
       </div>
       <div class="col-sm">
-        <h4>Decisions by country for refugees residing in {country_name}</h4>
-        $asylum_decisions/convert-f/filter_country-{countryiso}-residing/totals_per-Country/decision_bar-Country$
+        <h4>Last year decisions by country for refugees residing in {country_name}</h4>
+        $asylum_decisions/convert-f/filter_country-{countryiso}-residing/last_year/totals_per-Country/decision_bar-Country$
       </div>
     </div>
     <div class="row">
@@ -390,12 +390,12 @@ def report_demographics(countryiso):
   <div class="container">
     <div class="row">
       <div class="col-sm">
-        <h4>Demographics by country for refugees originating from {country_name}</h4>
-        $demographics/convert-f/filter_country-{countryiso}-originating/totals_per-Country/demographics_bar-Country-f$
+        <h4>Last year demographics by country for refugees originating from {country_name}</h4>
+        $demographics/convert-f/filter_country-{countryiso}-originating/last_year/totals_per-Country/demographics_bar-Country-f$
       </div>
       <div class="col-sm">
-        <h4>Demographics by country for refugees residing in {country_name}</h4>
-        $demographics/convert-f/filter_country-{countryiso}-residing/totals_per-Country/demographics_bar-Country-f$
+        <h4>Last year demographics by country for refugees residing in {country_name}</h4>
+        $demographics/convert-f/filter_country-{countryiso}-residing/last_year/totals_per-Country/demographics_bar-Country-f$
       </div>
     </div>
     <div class="row">
@@ -415,12 +415,12 @@ def report_demographics(countryiso):
   <div class="container">
     <div class="row">
       <div class="col-sm">
-        <h4>Demographics by country for refugees originating from {country_name}</h4>
-        $demographics/convert-f/filter_country-{countryiso}-originating/totals_per-Country/demographics_bar-Country-t$
+        <h4>Last year demographics by country for refugees originating from {country_name}</h4>
+        $demographics/convert-f/filter_country-{countryiso}-originating/last_year/totals_per-Country/demographics_bar-Country-t$
       </div>
       <div class="col-sm">
-        <h4>Demographics by country for refugees residing in {country_name}</h4>
-        $demographics/convert-f/filter_country-{countryiso}-residing/totals_per-Country/demographics_bar-Country-t$
+        <h4>Last year demographics by country for refugees residing in {country_name}</h4>
+        $demographics/convert-f/filter_country-{countryiso}-residing/last_year/totals_per-Country/demographics_bar-Country-t$
       </div>
     </div>
     <div class="row">
@@ -512,12 +512,12 @@ def report_solutions(countryiso):
   <div class="container">
     <div class="row">
       <div class="col-sm">
-        <h4>Solutions by country for refugees originating from {country_name}</h4>
-        $solutions/convert-f/filter_country-{countryiso}-originating/totals_per-Country/solutions_bar-Country$
+        <h4>Last year solutions by country for refugees originating from {country_name}</h4>
+        $solutions/convert-f/filter_country-{countryiso}-originating/last_year/totals_per-Country/solutions_bar-Country$
       </div>
       <div class="col-sm">
-        <h4>Solutions by country for refugees residing in {country_name}</h4>
-        $solutions/convert-f/filter_country-{countryiso}-residing/totals_per-Country/solutions_bar-Country$
+        <h4>Last year solutions by country for refugees residing in {country_name}</h4>
+        $solutions/convert-f/filter_country-{countryiso}-residing/last_year/totals_per-Country/solutions_bar-Country$
       </div>
     </div>
     <div class="row">
