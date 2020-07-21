@@ -30,7 +30,7 @@ def main():
     fields = configuration["fields"]
     source_directory = configuration["source_directory"]
     download_url = Path(source_directory).resolve().as_uri()
-
+       
     with Download() as downloader:
         countries, headers, countriesdata = get_countriesdata(
             download_url, resources, downloader

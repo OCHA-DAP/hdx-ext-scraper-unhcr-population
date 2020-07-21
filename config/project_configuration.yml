@@ -9,13 +9,13 @@ resources:
       title: 'Asylum applications by asylum-seekers residing in {countryname}'
       name: 'unhcr-asylum-seekers-residing-{countryiso}'
       description: |
-        This dataset has been collated by UNHCR andcontains information about
+        This dataset has been collated by UNHCR and contains information about
         the number of applications for asylum residing in {countryname}. Data is available since 2000.
     originating: 
       title: 'Asylum applications by asylum-seekers originating from {countryname}'
       name: 'unhcr-asylum-seekers-originating-{countryiso}'
       description: |
-        This dataset has been collated by UNHCR andcontains information about
+        This dataset has been collated by UNHCR and contains information about
         the number of applications for asylum originating from {countryname}. Data is available since 2000.
   asylum_decisions:
     file: HDX_AsylumDecisions.csv
@@ -35,14 +35,14 @@ resources:
       description: |
         This dataset has been collated by UNHCR and contains information about forcibly displaced populations
         and Stateless persons residing in {countryname}. It includes data on their demographics as well as sub-national locations.
-        Data is availablefrom 2001.
+        Data is available from 2001.
     originating: 
       title: 'Demographics and locations of forcibly displaced and stateless persons originating from {countryname}'    
       name: 'unhcr-demographics-originating-{countryiso}'
       description: |
         This dataset has been collated by UNHCR and contains information about forcibly displaced populations
         and Stateless persons originating from {countryname}. It includes data on their demographics as well as sub-national locations.
-        Data is availablefrom 2001.
+        Data is available from 2001.
   end_year_population_totals:
     file: HDX_EndYearPopulationTotals.csv
     residing:
