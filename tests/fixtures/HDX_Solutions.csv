@@ -1,4 +1,5 @@
 "Year","ISO3CoO","ISO3CoA","RST","NAT","RET","RDP"
+"#date+year","#country+origin+code","#country+asylum+code","#affected+resettled","#affected+naturalized","#affected+refugees+returnees","#affected+idps+returnees"
 1983,"IRN","PAK",0,0,390,0
 1985,"IRN","PAK",0,0,2450,0
 1988,"IRN","PAK",0,0,350,0

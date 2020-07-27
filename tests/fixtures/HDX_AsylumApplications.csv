@@ -1,4 +1,5 @@
 "Year","ISO3CoO","ISO3CoA","ProcedureType","ApplicationType","ApplicationDataType","ApplicationAveragePersonsPerCase","Applications"
+"#date+year","#country+origin+code","#country+asylum+code","#indicator+procedure_type+code","#indicator+application_type+code","#indicator+application_data_type+code","#indicator+application_average_persons+num","#inneed+asylum_seekers+applications"
 2000,"AFG","IRN","G","V","P","0",245854
 2000,"DZA","PAK","U","V","P","0",5
 2000,"EGY","PAK","U","V","P","0",5

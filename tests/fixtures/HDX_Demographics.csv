@@ -1,4 +1,5 @@
 "Year","ISO3CoO","ISO3CoA","PT","location","urbanRural","accommodationType","Female_0_4","Female_5_11","Female_12_17","Female_18_59","Female_60","Female_Unknown","Female_total","Male_0_4","Male_5_11","Male_12_17","Male_18_59","Male_60","Male_Unknown","Male_total","Total"
+"#date+year","#country+origin+code","#country+asylum+code","#indicator+population_type","#loc+name","#indicator+urban_rural+code","#indicator+accomodation_type+code","#affected+f+infants+age_0_4","#affected+f+children+age_5_11","#affected+f+adolescents+age_12_17","#affected+f+adults+age_18_59","#affected+f+elderly+age_60_","#affected+f+unknown_age","#affected+f+total","#affected+m+infants+age_0_4","#affected+m+children+age_5_11","#affected+m+adolescents+age_12_17","#affected+m+adults+age_18_59","#affected+m+elderly+age_60_","#affected+m+unknown_age","#affected+m+total","#affected+all+total"
 2001,"AFG","AFG","IDP","","","",0,0,0,0,0,0,0,0,0,0,0,0,0,0,1200000
 2001,"AFG","AFG","RET","","","",0,0,0,0,0,0,0,0,0,0,0,0,0,0,26092
 2001,"IRN","AFG","REF","","","",0,0,0,0,0,0,0,0,0,0,0,0,0,0,0

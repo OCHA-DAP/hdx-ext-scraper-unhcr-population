@@ -1,4 +1,5 @@
 "Year","ISO3CoO","ISO3CoA","ProcedureType","DecisionType","DecisionDataType","DecisionsAveragePersonsPerCase","Recognized","RecognizedOther","OtherwiseClosed","Rejected","TotalDecided"
+"#date+year","#country+origin+code","#country+asylum+code","#indicator+procedure_type","#indicator+decision_type","#indicator+decision_data_type+code","#indicator+decision_average_persons+num","#inneed+asylum_seekers+recognized","#inneed+asylum_seekers+recognized_other","#inneed+asylum_seekers+otherwise_closed","#inneed+asylum_seekers+rejected","#inneed+asylum_seekers+total_decided"
 2000,"AFG","IRN","G","FI","P","0",82638,3925,0,147063,233626
 2000,"IRN","AFG","U","FI","P","0",5,0,0,0,5
 2000,"IRN","PAK","U","FI","P","0",195,0,0,213,408
