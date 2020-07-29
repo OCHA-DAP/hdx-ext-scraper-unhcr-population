@@ -49,7 +49,7 @@ def main():
                 dataset["notes"] = dataset["notes"].replace(
                     "\n", "  \n"
                 )  # ensure markdown has line breaks
-                dataset.generate_resource_view(1)
+                dataset.preview_off()
                 dataset.create_in_hdx(
                     remove_additional_resources=True,
                     hxl_update=False,
@@ -63,7 +63,6 @@ def main():
 if __name__ == "__main__":
     facade(
         main,
-        user_agent_config_yaml=join(expanduser("~"), ".useragents.yml"),
-        user_agent_lookup=lookup,
+        user_agent='UNHCR_POPULATION',
         project_config_yaml=join("config", "project_configuration.yml"),
     )

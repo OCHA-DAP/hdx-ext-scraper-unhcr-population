@@ -4,7 +4,6 @@ caveats: ""
 methodology: "Other"
 methodology_other: "Other"
 dataset_source: "UNHCR"
-package_creator: "orest3.dubay@gmail.com"
 private: False  # has to be True or False
 url: ~
 state: "active"  # always "active".

@@ -86,8 +86,8 @@ def generate_dataset_and_showcase(folder, country, countrydata, headers, resourc
     logger.info("Creating dataset: %s" % title)
     slugified_name = slugify("UNHCR Population Data for %s" % countryiso).lower()
     dataset = Dataset({"name": slugified_name, "title": title,})
-    dataset.set_maintainer("196196be-6037-4488-8b71-d786adf4c081")
-    dataset.set_organization("hdx")
+    dataset.set_maintainer("8d70b12b-7247-48d2-b426-dbb4bf82eb7c")
+    dataset.set_organization("abf4ca86-8e69-40b1-92f7-71509992be88")
     dataset.set_expected_update_frequency("Every month")
     dataset.set_subnational(True)
     dataset.add_country_location(countryiso)
@@ -131,7 +131,11 @@ def generate_dataset_and_showcase(folder, country, countrydata, headers, resourc
         )
 
         if success is False:
-            logger.warning(f"{countryname} - {name}  has no data!")
+            logger.warning(f"{countryname} - {resource_name}  has no data!")
+
+    if len(dataset.get_resources()) == 0:
+        logger.error(f"{countryname}  has no data!")
+        return None, None
 
     showcase = Showcase(
         {
