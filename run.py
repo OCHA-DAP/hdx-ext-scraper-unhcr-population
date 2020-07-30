@@ -29,8 +29,11 @@ def main():
     resources = configuration["resources"]
     fields = configuration["fields"]
     source_directory = configuration["source_directory"]
-    download_url = Path(source_directory).resolve().as_uri()
-       
+    # Set the download_url as a path on linux
+    #download_url = Path(source_directory).resolve().as_uri()
+    # And just as it comes on Windows
+    download_url = source_directory
+
     with Download() as downloader:
         countries, headers, countriesdata = get_countriesdata(
             download_url, resources, downloader
@@ -63,6 +66,7 @@ def main():
 if __name__ == "__main__":
     facade(
         main,
+        # WARNING hard coded user agent
         user_agent='UNHCR_POPULATION',
         project_config_yaml=join("config", "project_configuration.yml"),
     )

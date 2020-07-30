@@ -1,6 +1,9 @@
 # Collector specific configuration
 download_url: "https://www.dropbox.com/s/9z2q521dq2vs1dx/HDX_Sample.zip?dl=0"
-source_directory: data
+# On Linux
+#source_directory: data
+# On Windows
+source_directory: '/Dropbox/UNHCR Statistics/Data/HDX/'
 
 resources:
   asylum_applications:
