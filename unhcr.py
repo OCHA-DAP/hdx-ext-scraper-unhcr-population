@@ -26,7 +26,7 @@ WORLD = "world"
 
 def get_countriesdata(download_url, resources, downloader):
     countriesdata = {WORLD: {"iso3": WORLD, "countryname": "World"}}
-    countries = list()
+    countries = set()
     if not download_url.endswith("/"):
         download_url += "/"
 
@@ -61,7 +61,7 @@ def get_countriesdata(download_url, resources, downloader):
                 logger.info(
                     f"Processing {countryiso} - {countryname}, resource {resource_name}"
                 )
-                countries.append({"iso3": countryiso, "countryname": countryname})
+                countries.add((countryiso, countryname))
                 row[country_name_column] = countryname
                 if countryiso not in countriesdata:
                     countriesdata[countryiso] = {}
@@ -75,6 +75,7 @@ def get_countriesdata(download_url, resources, downloader):
             headers.insert(3, country_name_column)
         for resource_name in resource_names:
             all_headers[resource_name] = headers
+    countries = [{"iso3": x[0], "countryname": x[1]} for x in sorted(list(countries))]
     return countries, all_headers, countriesdata
 
 
