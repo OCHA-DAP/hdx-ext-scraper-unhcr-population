@@ -94,7 +94,7 @@ def generate_dataset_and_showcase(folder, country, countrydata, headers, resourc
     try:
         dataset.add_country_location(countryiso)
     except HDXError:
-        logger.error(f"{countryname}  not recognised!")
+        logger.error(f"{countryname} ({countryiso})  not recognised!")
         return None, None
 
     tags = ["hxl", "refugees", "asylum", "population"]
