@@ -66,6 +66,6 @@ def main():
 if __name__ == "__main__":
     facade(
         main,
-        user_agent='UNHCR_POPULATION',
+        user_agent="UNHCR_POPULATION",
         project_config_yaml=join("config", "project_configuration.yml"),
     )

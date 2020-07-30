@@ -77,28 +77,28 @@ resources:
 fields:
   ASY:
     name: Asylum-seekers
-    tags: '#indicator+num+value+asylum_seeker'
+    tags: '#affected+asylum_seekers'
   AccommodationType:
     name: Accommodation Type
-    tags: '#indicator+accommodation'
+    tags: '#indicator+accommodation_type'
   ApplicationAveragePersonsPerCase:
     name: Application Average Persons Per Case
-    tags: '#indicator+average+num+value+applications+percase'
+    tags: '#indicator+application_average_persons+num'
   ApplicationDataType:
     name: Application Data Type
-    tags: '#meta+application+unit+code'
+    tags: '#indicator+application_data_type'
     encoding:
       name: Application Data
-      tags: '#meta+application+unit+name'
+      tags: '#indicator+application_data'
       map:
         C: Cases
         P: Persons
   ApplicationType:
     name: Application Type Code
-    tags: '#meta+application+kind+code'
+    tags: '#indicator+application_type+code'
     encoding:
       name: Application Type
-      tags: '#meta+application+kind+name'
+      tags: '#indicator+application_type'
       map:
         N:  New
         R:  Repeat
@@ -111,23 +111,23 @@ fields:
         SP: Subsidiary protection
   Applications:
     name: Number of Applications
-    tags: '#indicator+num+value+applications+total'
+    tags: '#inneed+asylum_seekers+applications'
   DecisionDataType:
     name: Decision Data Type
-    tags: '#meta+decision+unit+code'
+    tags: '#indicator+decision_data_type'
     encoding:
       name: Decision Data
-      tags: '#meta+decision+unit+name'
+      tags: '#indicator+decision_data'
       map:
         C: Cases
         P: Persons
   DecisionType:
     name: Decision Type Code
-    tags: '#meta+decision+code'
+    tags: '#indicator+decision_type+code'
     encoding:
       expand: false
       name: Decision Type
-      tags: '#meta+decision+name'
+      tags: '#indicator+decision_type'
       map:
          NA: New Applications
          FI: First instance decisions
@@ -145,119 +145,128 @@ fields:
          CA: Cantonal regulations in Switzerland
   DecisionsAveragePersonsPerCase:
     name: Decisions Average Persons Per Case
-    tags: '#indicator+average+num+value+decisions+percase'
+    tags: '#indicator+decision_average_persons+num'
   Female_0_4:
     name: Female 0-4
-    tags: '#population+f+infants+age0_4+num+value'
-  Female_12_17:
-    name: Female 12-17
-    tags: '#population+f+adolescents+age12_17+num+value'
-  Female_18_59:
-    name: Female 18-59
-    tags: '#population+f+adults+num+age18_59+value'
+    tags: '#affected+f+infants+age_0_4'
   Female_5_11:
     name: Female 5-11
-    tags: '#population+f+children+age5_11+num+value'
+    tags: '#affected+f+children+age_5_11'
+  Female_12_17:
+    name: Female 12-17
+    tags: '#affected+f+adolescents+age_12_17'
+  Female_18_59:
+    name: Female 18-59
+    tags: '#affected+f+adults+age_18_59'
   Female_60:
     name: Female 60 or more
-    tags: '#population+f+elderly+age60plus+num+value'
+    tags: '#affected+f+elderly+age_60'
   Female_Unknown:
     name: Female Unknown
-    tags: '#population+f+ageunknown+num+value'
+    tags: '#affected+f+unknown_age'
   Female_total:
     name: Female Total
-    tags: '#population+f+total+num+value'
+    tags: '#affected+f+total'
   IDP:
     name: Internally Displaced Persons
-    tags: '#indicator+num+value+idp'
-  ISO3CoA:
-    name: Country of Asylum
-    tags: '#country+code+iso+asylum'
+    tags: '#affected+idps'
   ISO3CoO:
-    name: Country of Origin
-    tags: '#country+code+iso+origin'
+    name: Country of Origin Code
+    tags: '#country+code+origin'
+  ISO3CoA:
+    name: Country of Asylum Code
+    tags: '#country+code+asylum'
+  CoO_name:
+    name: Country of Origin Name
+    tags: '#country+name+origin'
+  CoA_name:
+    name: Country of Asylum Name
+    tags: '#country+name+asylum'
   Location:
     name: Location
-    tags: '#loc'
+    tags: '#loc+name'
   Male_0_4:
     name: Male 0-4
-    tags: '#population+m+infants+age0_4+num+value'
-  Male_12_17:
-    name: Male 12-17
-    tags: '#population+m+adolescents+age12_17+num+value'
-  Male_18_59:
-    name: Male 18-59
-    tags: '#population+m+adults+age18_59+num+value'
+    tags: '#affected+m+infants+age_0_4'
   Male_5_11:
     name: Male 5-11
-    tags: '#population+m+children+age5_11+num+value'
+    tags: '#affected+m+children+age_5_11'
+  Male_12_17:
+    name: Male 12-17
+    tags: '#affected+m+adolescents+age_12_17'
+  Male_18_59:
+    name: Male 18-59
+    tags: '#affected+m+adults+age_18_59'
   Male_60:
     name: Male 60 or more
-    tags: '#population+m+elderly+age60plus+num+value'
+    tags: '#affected+m+elderly+age_60'
   Male_Unknown:
     name: Male Unknown
-    tags: '#population+m+ageunknown+num+value'
+    tags: '#affected+m+unknown_age'
   Male_total:
     name: Male Total
-    tags: '#population+m+total+num+value'
+    tags: '#affected+m+total'
   NAT:
     name: Naturalisation
-    tags: '#indicator+num+value+naturalisation'
+    tags: '#affected+naturalized'
   OOC:
     name: Others of Concern to UNHCR
-    tags: '#indicator+num+value+others_of_concern'
+    tags: '#affected+others'
   OtherwiseClosed:
     name: Otherwise Closed
-    tags: '#population+otherwise+closed+num+value'
+    tags: '#inneed+asylum_seekers+otherwise_closed'
   PopulationType:
     name: Population Type
-    tags: '#meta+code+population+type'
+    tags: '#indicator+population_type'
+  PT:
+    name: Population Type
+    tags: '#indicator+population_type'
   ProcedureType:
     name: Procedure Type
-    tags: '#action+procedure+code'
+    tags: '#indicator+procedure_type'
     encoding:
       name: Procedure Name
-      tags: '#action+procedure+name'
+      tags: '#indicator+procedure+name'
       map:
         G: Government
         U: UNHCR
         J: Joint
   RDP:
     name: IDP returns
-    tags: '#indicator+num+value+returns+idp'
+    tags: '#affected+idps+returnees'
   REF:
     name: Refugees
-    tags: '#indicator+num+value+refugee'
+    tags: '#affected+refugees'
   RET:
     name: Refugee returns
-    tags: '#indicator+num+value+returns+refugee'
+    tags: '#affected+refugees+returnees'
   RST:
     name: Resettlement arrivals
-    tags: '#indicator+num+value+resettlement+arrivals'
+    tags: '#affected+resettled'
   Recognized:
     name: Recognized
-    tags: '#population+recognized+num+value'
+    tags: '#inneed+asylum_seekers+recognized'
   RecognizedOther:
     name: Complementary Protection
-    tags: '#population+recognized+other+num+value'
+    tags: '#inneed+asylum_seekers+recognized_other'
   Rejected:
     name: Rejected
-    tags: '#population+rejected+num+value'
+    tags: '#inneed+asylum_seekers+rejected'
   STA:
     name: Stateless persons
-    tags: '#indicator+num+value+stateless'
+    tags: '#affected+stateless'
   Total:
     name: Total
-    tags: '#population+i+total+num+value'
+    tags: '#affected+all+total'
   TotalDecided:
     name: Total Decided
-    tags: '#population+total+decided+num+value'
+    tags: '#inneed+asylum_seekers+total_decided'
   UrbanRural:
     name: Urban or Rural
-    tags: '#indicator+urban+rural'
+    tags: '#indicator+urban_rural+code'
   VDA:
     name: Venezuelans Displaced Abroad
-    tags: '#indicator+num+value+venezuelans+displaced+abroad'
+    tags: '#affected+vda'
   Year:
     name: Year
     tags: '#date+year'
