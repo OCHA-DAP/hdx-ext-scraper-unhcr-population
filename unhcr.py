@@ -11,6 +11,7 @@ import logging
 from datetime import datetime
 
 from hdx.data.dataset import Dataset
+from hdx.data.hdxobject import HDXError
 from hdx.data.showcase import Showcase
 from hdx.location.country import Country
 from hdx.utilities.dictandlist import dict_of_lists_add
@@ -90,7 +91,12 @@ def generate_dataset_and_showcase(folder, country, countrydata, headers, resourc
     dataset.set_organization("abf4ca86-8e69-40b1-92f7-71509992be88")
     dataset.set_expected_update_frequency("Every month")
     dataset.set_subnational(True)
-    dataset.add_country_location(countryiso)
+    try:
+        dataset.add_country_location(countryiso)
+    except HDXError:
+        logger.error(f"{countryname}  not recognised!")
+        return None, None
+
     tags = ["hxl", "refugees", "asylum", "population"]
     dataset.add_tags(tags)
 
