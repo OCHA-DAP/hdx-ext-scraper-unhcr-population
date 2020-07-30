@@ -25,6 +25,9 @@ lookup = "hdx-scraper-unhcr-population"
 def main():
     """Generate dataset and create it in HDX"""
 
+    # Reset the start position
+    os.environ["WHERETOSTART "] = "RESET"
+
     configuration = Configuration.read()
     resources = configuration["resources"]
     fields = configuration["fields"]
