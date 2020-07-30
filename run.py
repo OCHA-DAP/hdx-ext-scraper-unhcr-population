@@ -63,6 +63,7 @@ def main():
 if __name__ == "__main__":
     facade(
         main,
+        # WARNING hard coded user agent
         user_agent='UNHCR_POPULATION',
         project_config_yaml=join("config", "project_configuration.yml"),
     )
