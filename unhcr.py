@@ -84,7 +84,7 @@ def generate_dataset_and_showcase(folder, country, countrydata, headers, resourc
     """
     countryiso = country["iso3"]
     countryname = country["countryname"]
-    title = "%s  - Data on forcibly displaced populations and stateless persons, collated by UNHCR" % countryname
+    title = "%s - Data on forcibly displaced populations and stateless persons" % countryname
     logger.info("Creating dataset: %s" % title)
     slugified_name = slugify("UNHCR Population Data for %s" % countryiso).lower()
     dataset = Dataset({"name": slugified_name, "title": title,})

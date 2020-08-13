@@ -1,11 +1,283 @@
 # Collector specific configuration
+download_url: "https://www.dropbox.com/s/9z2q521dq2vs1dx/HDX_Sample.zip?dl=0"
+# On Linux
+#source_directory: data
+# On Windows
+source_directory: 'tests/fixtures'
 
-files:
-    asylum_applications: HDX_AsylumApplications.csv
-    asylum_decisions: HDX_AsylumDecisions.csv
-    demographics: HDX_Demographics.csv
-    end_year_population_totals: HDX_EndYearPopulationTotals.csv
-    solutions: HDX_Solutions.csv
+resources:
+  asylum_applications:
+    file: HDX_AsylumApplications.csv
+    residing:
+      title: 'Asylum applications by asylum-seekers residing in {countryname}'
+      name: 'unhcr-asylum-seekers-residing-{countryiso}'
+      description: |
+        Dataset collated by UNHCR, containing information about
+        the number of applications for asylum residing in {countryname}. Data is available since 2000.
+    originating:
+      title: 'Asylum applications by asylum-seekers originating from {countryname}'
+      name: 'unhcr-asylum-seekers-originating-{countryiso}'
+      description: |
+        Data collated by UNHCR, containing information about
+        the number of applications for asylum originating from {countryname}.
+        Data is available since 2000.
+  asylum_decisions:
+    file: HDX_AsylumDecisions.csv
+    residing:
+      title: 'Asylum decisions taken on asylum claims of asylum-seekers residing in {countryname}'
+      name: 'unhcr-asylum-decisions-residing-{countryiso}'
+      description: |
+        Data collated by UNHCR about asylum decisions taken on asylum claims of asylum-seekers residing in {countryname}.
+        Data is available since 2000.
+    originating:
+      title: 'Asylum decisions taken on asylum claims of asylum-seekers originating from {countryname}'
+      name: 'unhcr-asylum-decisions-originating-{countryiso}'
+      description: |
+        Data collated by UNHCR about asylum decisions taken on asylum claims of asylum-seekers originating from {countryname}.
+        Data is available since 2000.
+  demographics:
+    file: HDX_Demographics.csv
+    residing:
+      title: 'Demographics and locations of forcibly displaced and stateless persons residing in {countryname}'
+      name: 'unhcr-demographics-residing-{countryiso}'
+      description: |
+        Data collated by UNHCR, containing information about forcibly displaced populations
+        and stateless persons residing in {countryname}. It includes data on their demographics as well as sub-national locations.
+        Data is available from 2001.
+    originating:
+      title: 'Demographics and locations of forcibly displaced persons originating from {countryname}'
+      name: 'unhcr-demographics-originating-{countryiso}'
+      description: |
+        Data collated by UNHCR, containing information about forcibly displaced populations
+        originating from {countryname}. It includes data on their demographics as well as sub-national locations.
+        Data is available from 2001.
+  end_year_population_totals:
+    file: HDX_EndYearPopulationTotals.csv
+    residing:
+      title: 'End-year stock population figures for forcibly displaced and stateless persons residing in {countryname}'
+      name: 'unhcr-population-forcibly-displaced-residing-{countryiso}'
+      description: |
+        Data collated by UNHCR, containing end-year stock population figures for forcibly displaced and stateless persons residing in {countryname}.
+        Data is available since 1951.
+    originating:
+      title: 'End-year stock population figures for forcibly displaced persons originating from {countryname}'
+      name: 'unhcr-population-forcibly-displaced-originating-{countryiso}'
+      description: |
+        Data collated by UNHCR, containing end-year stock population figures for forcibly displaced persons originating from {countryname}.
+        Data is available since 1951.
+  solutions:
+    file: HDX_Solutions.csv
+    residing:
+      title: 'Solutions for refugees and IDPs residing in {countryname}'
+      name: 'unhcr-solutions-residing-{countryiso}'
+      description: |
+        Data collated by UNHCR, containing information about the number of forcibly displaced
+        residing in {countryname} availing different types of solutions for refugees and IDPs such as
+        repatriation or resettlement. Data is available since 1983.
+    originating:
+      title: 'Solutions for refugees and IDPs originating from {countryname}'
+      name: 'unhcr-solutions-originating-{countryiso}'
+      description: |
+        Dataset collated by UNHCR, containing information about the number of forcibly displaced
+        originating from {countryname} availing different types of solutions for refugees and IDPs such as
+        repatriation or resettlement. Data is available since 1983.
 
-source_directory: tests/fixtures
+
+fields:
+  ASY:
+    name: Asylum-seekers
+    tags: '#affected+asylum_seekers'
+  AccommodationType:
+    name: Accommodation Type
+    tags: '#indicator+accommodation_type'
+  ApplicationAveragePersonsPerCase:
+    name: Application Average Persons Per Case
+    tags: '#indicator+application_average_persons+num'
+  ApplicationDataType:
+    name: Application Data Type
+    tags: '#indicator+application_data_type'
+    encoding:
+      name: Application Data
+      tags: '#indicator+application_data'
+      map:
+        C: Cases
+        P: Persons
+  ApplicationType:
+    name: Application Type Code
+    tags: '#indicator+application_type+code'
+    encoding:
+      name: Application Type
+      tags: '#indicator+application_type'
+      map:
+        N:  New
+        R:  Repeat
+        A:  Appeal
+        NA: New and appeal
+        NR: New and repeat
+        FA: First and appeal
+        J:  Judiciary
+        BL: Backlog
+        SP: Subsidiary protection
+  Applications:
+    name: Number of Applications
+    tags: '#inneed+asylum_seekers+applications'
+  DecisionDataType:
+    name: Decision Data Type
+    tags: '#indicator+decision_data_type'
+    encoding:
+      name: Decision Data
+      tags: '#indicator+decision_data'
+      map:
+        C: Cases
+        P: Persons
+  DecisionType:
+    name: Decision Type Code
+    tags: '#indicator+decision_type+code'
+    encoding:
+      expand: false
+      name: Decision Type
+      tags: '#indicator+decision_type'
+      map:
+         NA: New Applications
+         FI: First instance decisions
+         AR: Administrative Review decisions
+         RA: Repeat/reopened applications
+         IN: US Citizenship and Immigration Services
+         EO: US Executive Office of Immigration Review
+         JR: Judicial Review
+         SP: Subsidiary protection
+         FA: First instance and appeal
+         TP: Temporary protection
+         TA: Temporary asylum
+         BL: Backlog
+         TR: Temporary outside the asylum procedure
+         CA: Cantonal regulations in Switzerland
+  DecisionsAveragePersonsPerCase:
+    name: Decisions Average Persons Per Case
+    tags: '#indicator+decision_average_persons+num'
+  Female_0_4:
+    name: Female 0-4
+    tags: '#affected+f+infants+age_0_4'
+  Female_5_11:
+    name: Female 5-11
+    tags: '#affected+f+children+age_5_11'
+  Female_12_17:
+    name: Female 12-17
+    tags: '#affected+f+adolescents+age_12_17'
+  Female_18_59:
+    name: Female 18-59
+    tags: '#affected+f+adults+age_18_59'
+  Female_60:
+    name: Female 60 or more
+    tags: '#affected+f+elderly+age_60'
+  Female_Unknown:
+    name: Female Unknown
+    tags: '#affected+f+unknown_age'
+  Female_total:
+    name: Female Total
+    tags: '#affected+f+total'
+  IDP:
+    name: Internally Displaced Persons
+    tags: '#affected+idps'
+  ISO3CoO:
+    name: Country of Origin Code
+    tags: '#country+code+origin'
+  ISO3CoA:
+    name: Country of Asylum Code
+    tags: '#country+code+asylum'
+  CoO_name:
+    name: Country of Origin Name
+    tags: '#country+name+origin'
+  CoA_name:
+    name: Country of Asylum Name
+    tags: '#country+name+asylum'
+  Location:
+    name: Location
+    tags: '#loc+name'
+  Male_0_4:
+    name: Male 0-4
+    tags: '#affected+m+infants+age_0_4'
+  Male_5_11:
+    name: Male 5-11
+    tags: '#affected+m+children+age_5_11'
+  Male_12_17:
+    name: Male 12-17
+    tags: '#affected+m+adolescents+age_12_17'
+  Male_18_59:
+    name: Male 18-59
+    tags: '#affected+m+adults+age_18_59'
+  Male_60:
+    name: Male 60 or more
+    tags: '#affected+m+elderly+age_60'
+  Male_Unknown:
+    name: Male Unknown
+    tags: '#affected+m+unknown_age'
+  Male_total:
+    name: Male Total
+    tags: '#affected+m+total'
+  NAT:
+    name: Naturalisation
+    tags: '#affected+naturalized'
+  OOC:
+    name: Others of Concern to UNHCR
+    tags: '#affected+others'
+  OtherwiseClosed:
+    name: Otherwise Closed
+    tags: '#inneed+asylum_seekers+otherwise_closed'
+  PopulationType:
+    name: Population Type
+    tags: '#indicator+population_type'
+  PT:
+    name: Population Type
+    tags: '#indicator+population_type'
+  ProcedureType:
+    name: Procedure Type
+    tags: '#indicator+procedure_type'
+    encoding:
+      name: Procedure Name
+      tags: '#indicator+procedure+name'
+      map:
+        G: Government
+        U: UNHCR
+        J: Joint
+  RDP:
+    name: IDP returns
+    tags: '#affected+idps+returnees'
+  REF:
+    name: Refugees
+    tags: '#affected+refugees'
+  RET:
+    name: Refugee returns
+    tags: '#affected+refugees+returnees'
+  RST:
+    name: Resettlement arrivals
+    tags: '#affected+resettled'
+  Recognized:
+    name: Recognized
+    tags: '#inneed+asylum_seekers+recognized'
+  RecognizedOther:
+    name: Complementary Protection
+    tags: '#inneed+asylum_seekers+recognized_other'
+  Rejected:
+    name: Rejected
+    tags: '#inneed+asylum_seekers+rejected'
+  STA:
+    name: Stateless persons
+    tags: '#affected+stateless'
+  Total:
+    name: Total
+    tags: '#affected+all+total'
+  TotalDecided:
+    name: Total Decided
+    tags: '#inneed+asylum_seekers+total_decided'
+  UrbanRural:
+    name: Urban or Rural
+    tags: '#indicator+urban_rural+code'
+  VDA:
+    name: Venezuelans Displaced Abroad
+    tags: '#affected+vda'
+  Year:
+    name: Year
+    tags: '#date+year'
+
 

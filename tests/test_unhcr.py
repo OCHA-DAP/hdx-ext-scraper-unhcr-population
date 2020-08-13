@@ -21,7 +21,7 @@ from unhcr import generate_dataset_and_showcase, get_countriesdata
 
 
 class TestUNHCR:
-    @pytest.fixture(scope="function")
+    @pytest.fixture(scope="class")
     def configuration(self):
         Configuration._create(
             user_agent="test",
@@ -41,30 +41,25 @@ class TestUNHCR:
             "id": "4e61d464-4943-4e97-973a-84673c1aaa87",
             "name": "approved",
         }
+        return Configuration.read()
 
     @pytest.fixture(scope="class")
-    def data(self):
+    def data(self, configuration):
+        resources = configuration["resources"]
         download_url = (Path(__file__).resolve().parent / "fixtures").as_uri()
-        files = dict(
-            asylum_applications="HDX_AsylumApplications.csv",
-            asylum_decisions="HDX_AsylumDecisions.csv",
-            demographics="HDX_Demographics.csv",
-            end_year_population_totals="HDX_EndYearPopulationTotals.csv",
-            solutions="HDX_Solutions.csv",
-        )
 
         print(download_url)
-        return get_countriesdata(download_url, files, Download(user_agent="test"))
+        return get_countriesdata(download_url, resources, Download(user_agent="test"))
 
     def test_get_countriesdata(self, data):
         countries, headers, countriesdata = data
         assert len(headers) == 10
-        assert headers["asylum_applications_refugees"] == [
+        assert headers["asylum_applications_residing"] == [
             "Year",
             "ISO3CoO",
             "ISO3CoA",
-            "CoA_name",
             "CoO_name",
+            "CoA_name",
             "ProcedureType",
             "ApplicationType",
             "ApplicationDataType",
@@ -72,12 +67,12 @@ class TestUNHCR:
             "Applications",
         ]
         assert len(countriesdata) == 73
-        assert countriesdata["BGD"]["asylum_applications_refugees"][1] == {
+        assert countriesdata["BGD"]["asylum_applications_originating"][1] == {
             "Year": "2008",
             "ISO3CoO": "BGD",
             "ISO3CoA": "IRN",
-            "CoA_name": "Iran (Islamic Republic of)",
             "CoO_name": "Bangladesh",
+            "CoA_name": "Iran (Islamic Republic of)",
             "ProcedureType": "U",
             "ApplicationType": "N",
             "ApplicationDataType": "P",
@@ -87,15 +82,17 @@ class TestUNHCR:
 
     def test_generate_dataset_and_showcase(self, configuration, data):
         with temp_dir("ucdp") as folder:
+            resources = configuration["resources"]
+            fields = configuration["fields"]
             countries, headers, countriesdata = data
             index = [i for i, c in enumerate(countries) if c["iso3"] == "BGD"][0]
             dataset, showcase = generate_dataset_and_showcase(
-                folder, countries[index], countriesdata["BGD"], headers
+                folder, countries[index], countriesdata["BGD"], headers, resources, fields
             )
-            assert dataset["name"] == "unhcr-population-data-for-bangladesh"
-            assert dataset["title"] == "Bangladesh - Data on UNHCR population"
+            assert dataset["name"] == "unhcr-population-data-for-bgd"
+            assert dataset["title"] == "Bangladesh - Data on forcibly displaced populations and stateless persons"
 
             resources = dataset.get_resources()
             assert len(resources) == 4  # should be 10 if all data is available
 
-            assert showcase["name"] == "unhcr-population-data-for-bangladesh-showcase"
+            assert showcase["name"] == "unhcr-population-data-for-bgd-showcase"
