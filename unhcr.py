@@ -25,7 +25,7 @@ WORLD = "world"
 
 
 def get_countriesdata(download_url, resources, downloader):
-    countriesdata = {WORLD: {"iso3": WORLD, "countryname": "World"}}
+    countriesdata = {WORLD: {}}
     countries = set()
     if not download_url.endswith("/"):
         download_url += "/"
@@ -75,7 +75,7 @@ def get_countriesdata(download_url, resources, downloader):
             headers.insert(3, country_name_column)
         for resource_name in resource_names:
             all_headers[resource_name] = headers
-    countries = [{"iso3": x[0], "countryname": x[1]} for x in sorted(list(countries))]
+    countries = [{"iso3": WORLD, "countryname": "World"}] + [{"iso3": x[0], "countryname": x[1]} for x in sorted(list(countries))]
     return countries, all_headers, countriesdata
 
 
@@ -92,12 +92,15 @@ def generate_dataset_and_showcase(folder, country, countrydata, headers, resourc
     dataset.set_organization("abf4ca86-8e69-40b1-92f7-71509992be88")
     dataset.set_expected_update_frequency("Every year")
     dataset.set_subnational(True)
-    # Check for unknown country names
-    try:
-        dataset.add_country_location(countryiso)
-    except HDXError:
-        logger.error(f"{countryname} ({countryiso})  not recognised!")
-        return None, None
+    if countryiso == WORLD:
+        dataset.add_other_location('world')
+    else:
+        # Check for unknown country names
+        try:
+            dataset.add_country_location(countryiso)
+        except HDXError:
+            logger.error(f"{countryname} ({countryiso})  not recognised!")
+            return None, None
 
     tags = ["hxl", "refugees", "asylum", "population"]
     dataset.add_tags(tags)
