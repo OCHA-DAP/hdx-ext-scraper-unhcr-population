@@ -55,7 +55,7 @@ def main():
                 dataset.create_in_hdx(
                     remove_additional_resources=True,
                     hxl_update=False,
-                    updated_by_script="HDX Scraper: UNHCR population",
+                    updated_by_script="UNHCR population",
                     batch=info["batch"],
                 )
                 showcase.create_in_hdx()
