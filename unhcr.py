@@ -14,7 +14,6 @@ from hdx.data.dataset import Dataset
 from hdx.data.hdxobject import HDXError
 from hdx.data.showcase import Showcase
 from hdx.location.country import Country
-from hdx.utilities.dictandlist import dict_of_lists_add
 from slugify import slugify
 from urllib.parse import urljoin
 from fields import convert_fields_in_iterator, convert_headers, hxltags_mapping
@@ -111,6 +110,8 @@ def generate_dataset_and_showcase(folder, country, countrydata, headers, resourc
         enddate = datetime(year, 12, 31)
         return {"startdate": startdate, "enddate": enddate}
 
+    earliest_startdate = None
+    latest_enddate = None
     for resource_name, resource_rows in countrydata.items():
         resource_id = "_".join(resource_name.split("_")[:-1])
         originating_residing = resource_name.split("_")[-1] # originating or residing
@@ -143,11 +144,18 @@ def generate_dataset_and_showcase(folder, country, countrydata, headers, resourc
 
         if success is False:
             logger.warning(f"{countryname} - {resource_name}  has no data!")
+        else:
+            startdate = results['startdate']
+            if earliest_startdate is None or startdate < earliest_startdate:
+                earliest_startdate = startdate
+            enddate = results['enddate']
+            if latest_enddate is None or enddate > latest_enddate:
+                latest_enddate = enddate
 
     if len(dataset.get_resources()) == 0:
         logger.error(f"{countryname}  has no data!")
         return None, None
-
+    dataset.set_dataset_date_from_datetime(earliest_startdate, latest_enddate)
     showcase = Showcase(
         {
             "name": "%s-showcase" % slugified_name,
