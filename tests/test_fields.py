@@ -20,10 +20,10 @@ fields:
     name: field1 renamed
   field2:
     name: field2 renamed
-    tags: '#indicator+code'
+    tags: "#indicator+code"
     encoding:
       name: field2e
-      tags: '#indicator+name'
+      tags: "#indicator+name"
       map:
         f2val1: f2val1 mapped
         ''',
