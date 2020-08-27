@@ -1,9 +1,5 @@
 # Collector specific configuration
 download_url: "https://www.dropbox.com/s/9z2q521dq2vs1dx/HDX_Sample.zip?dl=0"
-# On Linux
-#source_directory: data
-# On Windows
-source_directory: 'tests/fixtures'
 
 resources:
   asylum_applications:
