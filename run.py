@@ -28,9 +28,9 @@ def main():
     resources = configuration['resources']
     fields = configuration['fields']
     # Set the download_url as a path on linux
-    #download_url = Path("data").resolve().as_uri()
+    #download_url = Path('data').resolve().as_uri()
     # And just as it comes on Windows
-    download_url = "/Dropbox/UNHCR Statistics/Data/HDX/"
+    download_url = '/Dropbox/UNHCR Statistics/Data/HDX/'
 
     with Download() as downloader:
         countries, headers, countriesdata = get_countriesdata(
