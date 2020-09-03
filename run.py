@@ -28,13 +28,13 @@ def main():
     resources = configuration['resources']
     fields = configuration['fields']
     # Set the download_url as a path on linux
-    #download_url = Path('data').resolve().as_uri()
+    download_url = Path('data').resolve().as_uri()
     # And just as it comes on Windows
-    download_url = '/Dropbox/UNHCR Statistics/Data/HDX/'
+    #download_url = '/Dropbox/UNHCR Statistics/Data/HDX/'
 
     with Download() as downloader:
-        countries, headers, countriesdata = get_countriesdata(
-            download_url, resources, downloader
+        countries, headers, countriesdata, qc_rows = get_countriesdata(
+            download_url, resources, fields, downloader
         )
         logger.info('Number of countries: %d' % len(countriesdata))
         for info, country in progress_storing_tempdir(
@@ -42,8 +42,9 @@ def main():
         ):
             folder = info['folder']
 
+            countryiso = country['iso3']
             dataset, showcase = generate_dataset_and_showcase(
-                folder, country, countriesdata[country['iso3']], headers, resources, fields
+                folder, country, countriesdata[countryiso], qc_rows[countryiso], headers, resources, fields
             )
             if dataset:
                 dataset.update_from_yaml()

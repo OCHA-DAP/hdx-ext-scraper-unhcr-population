@@ -23,8 +23,9 @@ logger = logging.getLogger(__name__)
 WORLD = 'world'
 
 
-def get_countriesdata(download_url, resources, downloader):
+def get_countriesdata(download_url, resources, fields, downloader):
     countriesdata = {WORLD: {}}
+    qc_rows = dict()
     countries = set()
     if not download_url.endswith('/'):
         download_url += '/'
@@ -70,15 +71,40 @@ def get_countriesdata(download_url, resources, downloader):
                     countriesdata[WORLD][resource_name] = []
                 countriesdata[countryiso][resource_name].append(row)
                 countriesdata[WORLD][resource_name].append(row)
+                qc_country = qc_rows.get(countryiso, dict())
+                year = row['Year']
+                origin = row['ISO3CoO']
+                asylum = row['ISO3CoA']
+                row_key = f'{year}_{origin}_{asylum}'
+                qc_row = qc_country.get(row_key, dict())
+                qc_row['#date+year'] = year
+                qc_row['#country+code+origin'] = origin
+                qc_row['#country+code+asylum'] = asylum
+                qc_row['#country+name+origin'] = Country.get_country_name_from_iso3(origin)
+                qc_row['#country+name+asylum'] = Country.get_country_name_from_iso3(asylum)
+                if countryiso == origin:
+                    attribute = 'outgoing'
+                else:
+                    attribute = 'incoming'
+                for field in ['Applications', 'REF', 'IDP', 'ASY', 'OOC', 'STA', 'VDA']:
+                    value = row.get(field)
+                    if value is None:
+                        continue
+                    tag = fields[field]['tags']
+                    hashtag = f'{tag}+{attribute}'
+                    qc_row[hashtag] = value
+                qc_country[row_key] = qc_row
+                qc_rows[countryiso] = qc_country
         for country_name_column in country_name_columns:
             headers.insert(3, country_name_column)
         for resource_name in resource_names:
             all_headers[resource_name] = headers
     countries = [{'iso3': WORLD, 'countryname': 'World'}] + [{'iso3': x[0], 'countryname': x[1]} for x in sorted(list(countries))]
-    return countries, all_headers, countriesdata
+    qc_rows[WORLD] = None
+    return countries, all_headers, countriesdata, qc_rows
 
 
-def generate_dataset_and_showcase(folder, country, countrydata, headers, resources, fields):
+def generate_dataset_and_showcase(folder, country, countrydata, qc_rows, headers, resources, fields):
     '''
     '''
     countryiso = country['iso3']
@@ -118,7 +144,7 @@ def generate_dataset_and_showcase(folder, country, countrydata, headers, resourc
     latest_enddate = None
     for resource_name, resource_rows in countrydata.items():
         resource_id = '_'.join(resource_name.split('_')[:-1])
-        originating_residing = resource_name.split('_')[-1] # originating or residing
+        originating_residing = resource_name.split('_')[-1]  # originating or residing
         record = resources[resource_id]
 
         if countryiso == WORLD:  # refugees and asylants contain the same data for WORLD
@@ -161,6 +187,14 @@ def generate_dataset_and_showcase(folder, country, countrydata, headers, resourc
         logger.error(f'{countryname}  has no data!')
         return None, None
     dataset.set_dataset_date_from_datetime(earliest_startdate, latest_enddate)
+    if countryiso != WORLD:
+        filename = 'qc_data.csv'
+        resourcedata = {
+            'name': filename,
+            'description': 'QuickCharts data for %s' % countryname,
+        }
+        rows = list(qc_rows.values())
+        dataset.generate_resource_from_rows(folder, filename, rows, resourcedata, list(rows[0].keys()))
     showcase = Showcase(
         {
             'name': '%s-showcase' % slugified_name,
