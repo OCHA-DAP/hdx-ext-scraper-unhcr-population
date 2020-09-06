@@ -98,10 +98,86 @@ def convert_headers(headers, fields):
     "Rename and eventually add new fields into headers using the fields structure"
     _, encoding_field_names = encoding(fields, use_original_field_names=True)
 
-    new_headers=[]
+    new_headers = []
     for field in headers:
-        new_headers.append(fields.get(field,{}).get("name",field))
+        new_headers.append(fields.get(field, {}).get("name", field))
         if field in encoding_field_names:
             new_headers.append(encoding_field_names[field])
 
     return new_headers
+
+
+class RowIteratorMixin(object):
+    """Mixin defining RowIterator builder interface"""
+    def headers(self):
+        "List of field names of the row iterator"
+        return self._headers
+
+    def hxltags_mapping(self):
+        "Dictionary mapping field names to hxl tags"
+        return {}
+    
+    def with_sum_field(self, field_name, hxltag="", sum_fields=[]):
+        "Create a new column fith *field_name* and *hxltag* that is a sum of *sum_fields*"
+        return RowIteratorWithSumField(self, field_name, hxltag, sum_fields)
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        return next(self._iterator)
+
+
+class RowIterator(RowIteratorMixin):
+    def __init__(self, headers, iterator):
+        self._headers = headers
+        self._iterator = iter(iterator)
+    def with_fields(self, fields):
+        """Use fields structure to perform the conversion.
+        This should only be applied once, therefore it is defined only on the RowIterator."""
+        return RowIteratorWithFields(self._headers, self._iterator, fields)
+
+class RowIteratorWithFields(RowIteratorMixin):
+    """Row iterator doing the field conversion"""
+    def __init__(self, headers, iterator, fields):
+        self._headers = headers
+        self._iterator = convert_fields_in_iterator(iter(iterator), fields)
+        self._fields = fields
+
+    def headers(self):
+        "List of field names of the row iterator"
+        return convert_headers(self._headers, self._fields)
+
+    def hxltags_mapping(self):
+        return hxltags_mapping(self._fields)
+
+
+class RowIteratorWithSumField(RowIteratorMixin):
+    def __init__(self, rowit, field_name, hxltag, sum_fields):
+        self.rowit = rowit
+        self.field_name = field_name
+        self.hxltag = hxltag
+        self.sum_fields = sum_fields
+
+    def headers(self):
+        "List of field names of the row iterator"
+        return self.rowit.headers() + [self.field_name]
+
+    def hxltags_mapping(self):
+        mapping = self.rowit.hxltags_mapping()
+        mapping[self.field_name] = self.hxltag
+        return mapping
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        row = next(self.rowit)
+        value = 0.0
+        for field in self.sum_fields:
+            try:
+                value += row.get(field, 0)
+            except ValueError:
+                pass
+        row[self.field_name] = value
+        return row
