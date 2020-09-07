@@ -16,7 +16,7 @@ from hdx.data.showcase import Showcase
 from hdx.location.country import Country
 from slugify import slugify
 from urllib.parse import urljoin
-from fields import RowIterator
+from fields import RowIterator, ListIterator
 
 logger = logging.getLogger(__name__)
 
@@ -77,26 +77,26 @@ def get_countriesdata(download_url, resources, fields, downloader):
                 asylum = row["ISO3CoA"]
                 row_key = f"{year}_{origin}_{asylum}"
                 qc_row = qc_country.get(row_key, dict())
-                qc_row["#date+year"] = year
-                qc_row["#country+code+origin"] = origin
-                qc_row["#country+code+asylum"] = asylum
-                qc_row["#country+name+origin"] = Country.get_country_name_from_iso3(
+                qc_row["Year"] = year
+                qc_row["ISO3CoO"] = origin
+                qc_row["ISO3CoA"] = asylum
+                qc_row["CoO_name"] = Country.get_country_name_from_iso3(
                     origin
                 )
-                qc_row["#country+name+asylum"] = Country.get_country_name_from_iso3(
+                qc_row["CoA_name"] = Country.get_country_name_from_iso3(
                     asylum
                 )
                 if countryiso == origin:
                     attribute = "outgoing"
                 else:
                     attribute = "incoming"
-                for field in ["Applications", "REF", "IDP", "ASY", "OOC", "STA", "VDA"]:
+                for field in ["Applications", "ASY", "IDP", "OOC", "REF", "STA", "VDA"]:
                     value = row.get(field)
                     if value is None:
                         continue
-                    tag = fields[field]["tags"]
-                    hashtag = f"{tag}+{attribute}"
-                    qc_row[hashtag] = value
+                    qc_field = f"{field}_{attribute}"
+                    qc_row[qc_field] = value
+
                 qc_country[row_key] = qc_row
                 qc_rows[countryiso] = qc_country
         for country_name_column in country_name_columns:
@@ -206,10 +206,22 @@ def generate_dataset_and_showcase(
             "name": filename,
             "description": "QuickCharts data for %s" % countryname,
         }
-        rows = list(qc_rows.values())
-        dataset.generate_resource_from_rows(
-            folder, filename, rows, resourcedata, list(rows[0].keys())
+        rowit = ListIterator(data =list(qc_rows.values()), headers=["Year"]).auto_headers().with_fields(fields)
+        success, results = dataset.generate_resource_from_iterator(
+            rowit.headers(),
+            rowit,
+            rowit.hxltags_mapping(),
+            folder,
+            filename,
+            resourcedata,
+            date_function=process_dates,
+            #           quickcharts=quickcharts,
         )
+        if success is False:
+            logger.warning(f"QuickChart {countryname} - {resource_name}  has no data!")
+#        dataset.generate_resource_from_rows(
+#            folder, filename, rows, resourcedata, list(rows[0].keys())
+#        )
     showcase = Showcase(
         {
             "name": "%s-showcase" % slugified_name,

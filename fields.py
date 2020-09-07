@@ -137,6 +137,29 @@ class RowIterator(RowIteratorMixin):
         This should only be applied once, therefore it is defined only on the RowIterator."""
         return RowIteratorWithFields(self._headers, self._iterator, fields)
 
+class ListIterator(RowIteratorMixin):
+    def __init__(self, data, headers=None):
+        self._headers = headers or []
+        self._data = data
+        self._iterator = iter(data)
+    def auto_headers(self, scan_all_rows=False):
+        """Automatically add all fields in data.
+        By default only look at the first row, unless *scan_all_rows* is True,
+        in which case all rows are scanned for fields. 
+        """
+        extra_headers=set([])
+        data = self._data if scan_all_rows else self._data[:1]
+        for row in data:
+            for field in row.keys():
+                if field not in self._headers:
+                    extra_headers.add(field)
+        self._headers += sorted(extra_headers)
+        return self
+    def with_fields(self, fields):
+        """Use fields structure to perform the conversion.
+        This should only be applied once, therefore it is defined only on the RowIterator."""
+        return RowIteratorWithFields(self._headers, self._iterator, fields)
+
 class RowIteratorWithFields(RowIteratorMixin):
     """Row iterator doing the field conversion"""
     def __init__(self, headers, iterator, fields):

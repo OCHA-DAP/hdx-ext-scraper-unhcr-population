@@ -83,6 +83,12 @@ fields:
   ASY:
     name: Asylum-seekers
     tags: "#affected+asylum_seekers"
+  ASY_incoming:
+    name: Asylum-seekers Incoming
+    tags: "#affected+asylum_seekers+incoming"
+  ASY_outgoing:
+    name: Asylum-seekers Outgoing
+    tags: "#affected+asylum_seekers+outgoing"
   AccommodationType:
     name: Accommodation Type
     tags: "#indicator+accommodation_type"
@@ -117,6 +123,12 @@ fields:
   Applications:
     name: Number of Applications
     tags: "#inneed+asylum_seekers+applications"
+  Applications_incoming:
+    name: Number of Applications Incoming
+    tags: "#inneed+asylum_seekers+applications+incoming"
+  Applications_outgoing:
+    name: Number of Applications Outgoing
+    tags: "#inneed+asylum_seekers+applications+outgoing"
   DecisionDataType:
     name: Decision Data Type
     tags: "#indicator+decision_data_type"
@@ -175,6 +187,12 @@ fields:
   IDP:
     name: Internally Displaced Persons
     tags: "#affected+idps"
+  IDP_incoming:
+    name: Internally Displaced Persons Incoming
+    tags: "#affected+idps+incoming"
+  IDP_outgoing:
+    name: Internally Displaced Persons Outgoing
+    tags: "#affected+idps+outgoing"
   ISO3CoO:
     name: Country of Origin Code
     tags: "#country+code+origin"
@@ -214,9 +232,21 @@ fields:
   NAT:
     name: Naturalisation
     tags: "#affected+naturalized"
+  NAT_incoming:
+    name: Naturalisation Incoming
+    tags: "#affected+naturalized+incoming"
+  NAT_outgoing:
+    name: Naturalisation Outgoing
+    tags: "#affected+naturalized+outgoing"
   OOC:
     name: Others of Concern to UNHCR
     tags: "#affected+others"
+  OOC_incoming:
+    name: Others of Concern to UNHCR Incoming
+    tags: "#affected+others+incoming"
+  OOC_outgoing:
+    name: Others of Concern to UNHCR Outgoing
+    tags: "#affected+others+outgoing"
   OtherwiseClosed:
     name: Otherwise Closed
     tags: "#inneed+asylum_seekers+otherwise_closed"
@@ -242,6 +272,12 @@ fields:
   REF:
     name: Refugees
     tags: "#affected+refugees"
+  REF_incoming:
+    name: Refugees Incoming
+    tags: "#affected+refugees+incoming"
+  REF_outgoing:
+    name: Refugees Outgoing
+    tags: "#affected+refugees+outgoing"
   RET:
     name: Refugee returns
     tags: "#affected+refugees+returnees"
@@ -258,8 +294,14 @@ fields:
     name: Rejected
     tags: "#inneed+asylum_seekers+rejected"
   STA:
-    name: Stateless persons
+    name: Stateless Persons
     tags: "#affected+stateless"
+  STA_incoming:
+    name: Stateless Persons Incoming
+    tags: "#affected+stateless+incoming"
+  STA_outgoing:
+    name: Stateless Persons Outgoing
+    tags: "#affected+stateless+outgoing"
   Total:
     name: Total
     tags: "#affected+all+total"
@@ -272,6 +314,12 @@ fields:
   VDA:
     name: Venezuelans Displaced Abroad
     tags: "#affected+vda"
+  VDA_incoming:
+    name: Venezuelans Displaced Abroad Incoming
+    tags: "#affected+vda+incoming"
+  VDA_outgoing:
+    name: Venezuelans Displaced Abroad Outgoing
+    tags: "#affected+vda+outgoing"
   Year:
     name: Year
     tags: "#date+year"
