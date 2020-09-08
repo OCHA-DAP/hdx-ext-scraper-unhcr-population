@@ -80,12 +80,8 @@ def get_countriesdata(download_url, resources, fields, downloader):
                 qc_row["Year"] = year
                 qc_row["ISO3CoO"] = origin
                 qc_row["ISO3CoA"] = asylum
-                qc_row["CoO_name"] = Country.get_country_name_from_iso3(
-                    origin
-                )
-                qc_row["CoA_name"] = Country.get_country_name_from_iso3(
-                    asylum
-                )
+                qc_row["CoO_name"] = Country.get_country_name_from_iso3(origin)
+                qc_row["CoA_name"] = Country.get_country_name_from_iso3(asylum)
                 if countryiso == origin:
                     attribute = "outgoing"
                 else:
@@ -206,7 +202,38 @@ def generate_dataset_and_showcase(
             "name": filename,
             "description": "QuickCharts data for %s" % countryname,
         }
-        rowit = ListIterator(data =list(qc_rows.values()), headers=["Year"]).auto_headers().with_fields(fields)
+
+        rowit = ListIterator(
+            data=list(qc_rows.values()),
+            headers=[
+                "Year",
+                "Country of Origin Code",
+                "Country of Origin Name",
+                "Country of Asylum Code",
+                "Country of Asylum Name",
+                "Total Incoming",
+                "Total Outgoing",
+            ],
+        ).auto_headers().to_list_iterator()
+        years = sorted(set(rowit.column("Year")))[-10:]
+        headers = rowit.headers()
+        rowit = (
+            rowit
+            .select(lambda row,years=years:row.get("Year") in years)
+            .with_sum_field(
+                "Total Incoming",
+                "#affected+resettled+incoming",
+                [x for x in headers if x.endswith("_incoming")],
+            )
+            .with_sum_field(
+                "Total Outgoing",
+                "#affected+resettled+outgoing",
+                [x for x in headers if x.endswith("_outgoing")],
+            )
+            .with_fields(fields)
+#            .sort_by("Total Outgoing", descending=True)
+        )
+
         success, results = dataset.generate_resource_from_iterator(
             rowit.headers(),
             rowit,
@@ -219,9 +246,13 @@ def generate_dataset_and_showcase(
         )
         if success is False:
             logger.warning(f"QuickChart {countryname} - {resource_name}  has no data!")
-#        dataset.generate_resource_from_rows(
-#            folder, filename, rows, resourcedata, list(rows[0].keys())
-#        )
+
+        ### DEBUG:
+        #rowit.reset().to_csv(f"qc_data_{countryiso}.csv")
+
+    #        dataset.generate_resource_from_rows(
+    #            folder, filename, rows, resourcedata, list(rows[0].keys())
+    #        )
     showcase = Showcase(
         {
             "name": "%s-showcase" % slugified_name,

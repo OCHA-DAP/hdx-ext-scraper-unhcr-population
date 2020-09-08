@@ -40,6 +40,8 @@ def main():
         for info, country in progress_storing_tempdir(
             'UNHCR_population', countries, 'iso3'
         ):
+            #if country["iso3"]!="AFG":
+            #    continue
             folder = info['folder']
 
             countryiso = country['iso3']
