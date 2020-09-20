@@ -207,19 +207,19 @@ def generate_dataset_and_showcase(
             data=list(qc_rows.values()),
             headers=[
                 "Year",
-                "Country of Origin Code",
-                "Country of Origin Name",
-                "Country of Asylum Code",
-                "Country of Asylum Name",
+                "ISO3CoO",
+                "CoO_name",
+                "ISO3CoA",
+                "CoA_name",
                 "Total Incoming",
                 "Total Outgoing",
             ],
         ).auto_headers().to_list_iterator()
-        years = sorted(set(rowit.column("Year")))[-10:]
+        years = sorted(set(rowit.column("Year")))[-10:] # Last 10 years
         headers = rowit.headers()
         rowit = (
             rowit
-            .select(lambda row,years=years:row.get("Year") in years)
+            .select(lambda row,years=years:row.get("Year") in years) # Restrict data to only last 10 years
             .with_sum_field(
                 "Total Incoming",
                 "#affected+resettled+incoming",
@@ -233,7 +233,6 @@ def generate_dataset_and_showcase(
             .with_fields(fields)
 #            .sort_by("Total Outgoing", descending=True)
         )
-
         success, results = dataset.generate_resource_from_iterator(
             rowit.headers(),
             rowit,

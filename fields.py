@@ -226,6 +226,7 @@ class ListIterator(RowIteratorMixin):
             for field in row.keys():
                 if field not in self._headers:
                     extra_headers.add(field)
+
         self._headers += sorted(extra_headers)
         return self
 
@@ -260,7 +261,10 @@ class RowIteratorWithSumField(RowIteratorProxyMixin):
 
     def headers(self):
         "List of field names of the row iterator"
-        return self.rowit.headers() + [self.field_name]
+        headers = self.rowit.headers()[:]
+        if self.field_name not in headers:
+            headers.append(self.field_name)
+        return headers
 
     def hxltags_mapping(self):
         mapping = self.rowit.hxltags_mapping()
