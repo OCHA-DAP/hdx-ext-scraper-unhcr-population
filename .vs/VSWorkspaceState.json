@@ -2,7 +2,9 @@
   "ExpandedNodes": [
     "",
     "\\config",
-    "\\doc"
+    "\\doc",
+    "\\tests",
+    "\\tests\\config"
   ],
   "SelectedNode": "\\run.py",
   "PreviewInSolutionExplorer": false

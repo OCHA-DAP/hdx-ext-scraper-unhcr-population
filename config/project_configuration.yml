@@ -5,7 +5,7 @@ resources:
   asylum_applications:
     file: HDX_AsylumApplications.csv
     residing:
-      title: "Asylum applications by asylum-seekers residing in {countryname}"
+      title: "Asylum applications by asylum-seekers residing in {countryname}  "
       name: "unhcr-asylum-seekers-residing-{countryiso}"
       description: |
         Dataset collated by UNHCR, containing information about
