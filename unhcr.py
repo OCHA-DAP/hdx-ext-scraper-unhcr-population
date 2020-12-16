@@ -82,17 +82,18 @@ def get_countriesdata(download_url, resources, fields, downloader):
                 qc_row["ISO3CoA"] = asylum
                 qc_row["CoO_name"] = Country.get_country_name_from_iso3(origin)
                 qc_row["CoA_name"] = Country.get_country_name_from_iso3(asylum)
+                attributes = list()
                 if countryiso == origin:
-                    attribute = "outgoing"
-                else:
-                    attribute = "incoming"
-                for field in ["Applications", "ASY", "IDP", "OOC", "REF", "STA", "VDA"]:
-                    value = row.get(field)
-                    if value is None:
-                        continue
-                    qc_field = f"{field}_{attribute}"
-                    qc_row[qc_field] = value
-
+                    attributes.append("outgoing")
+                if countryiso == asylum:
+                    attributes.append("incoming")
+                for attribute in attributes:
+                    for field in ["Applications", "ASY", "IDP", "OOC", "REF", "STA", "VDA"]:
+                        value = row.get(field)
+                        if value is None:
+                            continue
+                        qc_field = f"{field}_{attribute}"
+                        qc_row[qc_field] = value
                 qc_country[row_key] = qc_row
                 qc_rows[countryiso] = qc_country
         for country_name_column in country_name_columns:
