@@ -22,6 +22,12 @@ logger = logging.getLogger(__name__)
 
 WORLD = 'world'
 
+# Dec-2020 - add a switch for the latest year and if the data is ASR or MYSR
+# If MYSR, then the date in the latest year should be 30-June not 31-Dec
+LATEST_YEAR = 2020
+IS_ASR = False
+
+
 
 def get_countriesdata(download_url, resources, downloader):
     countriesdata = {WORLD: {}}
@@ -108,11 +114,19 @@ def generate_dataset_and_showcase(folder, country, countrydata, headers, resourc
     tags = ['hxl', 'refugees', 'asylum', 'population']
     dataset.add_tags(tags)
 
+
     def process_dates(row):
         year = int(row['Year'])
         startdate = datetime(year, 1, 1)
-        enddate = datetime(year, 12, 31)
+        # For mid-year data it should be 30-June...
+        #enddate = datetime(year, 12, 31)
+        if (IS_ASR == False & year == LATEST_YEAR):
+            enddate = datetime(year, 6, 30)
+        else: 
+            enddate = datetime(year, 12, 31)
+
         return {'startdate': startdate, 'enddate': enddate}
+
 
     earliest_startdate = None
     latest_enddate = None
@@ -121,7 +135,7 @@ def generate_dataset_and_showcase(folder, country, countrydata, headers, resourc
         originating_residing = resource_name.split('_')[-1] # originating or residing
         record = resources[resource_id]
 
-        if countryiso == WORLD:  # refugees and asylants contain the same data for WORLD
+        if countryiso == WORLD:  # refugees and asylum applicants contain the same data for WORLD
             if originating_residing=='originating':
                 continue
         format_parameters = dict(countryiso=countryiso.lower(), countryname=countryname)
