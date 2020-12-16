@@ -2,8 +2,10 @@
   "ExpandedNodes": [
     "",
     "\\config",
-    "\\doc"
+    "\\doc",
+    "\\tests",
+    "\\tests\\config"
   ],
-  "SelectedNode": "\\run.py",
+  "SelectedNode": "\\unhcr.py",
   "PreviewInSolutionExplorer": false
 }

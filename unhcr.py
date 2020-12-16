@@ -27,7 +27,6 @@ WORLD = 'world'
 LATEST_YEAR = 2020
 IS_ASR = False
 
-
 def get_countriesdata(download_url, resources, downloader):
     countriesdata = {WORLD: {}}
     qc_rows = dict()
@@ -144,17 +143,18 @@ def generate_dataset_and_showcase(
     tags = ['hxl', 'refugees', 'asylum', 'population']
     dataset.add_tags(tags)
 
+
     def process_dates(row):
         year = int(row['Year'])
         startdate = datetime(year, 1, 1)
-        enddate = datetime(year, 12, 31)
         # For mid-year data it should be 30-June...
-        # enddate = datetime(year, 12, 31)
+        #enddate = datetime(year, 12, 31)
         if (IS_ASR == False & year == LATEST_YEAR):
             enddate = datetime(year, 6, 30)
-        else:
+        else: 
             enddate = datetime(year, 12, 31)
         return {'startdate': startdate, 'enddate': enddate}
+
 
     earliest_startdate = None
     latest_enddate = None
