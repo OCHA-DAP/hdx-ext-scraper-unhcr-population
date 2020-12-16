@@ -16,7 +16,7 @@ from hdx.data.showcase import Showcase
 from hdx.location.country import Country
 from slugify import slugify
 from urllib.parse import urljoin
-from fields import convert_fields_in_iterator, convert_headers, hxltags_mapping
+from fields import RowIterator, ListIterator
 
 logger = logging.getLogger(__name__)
 
@@ -27,10 +27,9 @@ WORLD = 'world'
 LATEST_YEAR = 2020
 IS_ASR = False
 
-
-
 def get_countriesdata(download_url, resources, downloader):
     countriesdata = {WORLD: {}}
+    qc_rows = dict()
     countries = set()
     if not download_url.endswith('/'):
         download_url += '/'
@@ -76,15 +75,45 @@ def get_countriesdata(download_url, resources, downloader):
                     countriesdata[WORLD][resource_name] = []
                 countriesdata[countryiso][resource_name].append(row)
                 countriesdata[WORLD][resource_name].append(row)
+                qc_country = qc_rows.get(countryiso, dict())
+                year = row['Year']
+                origin = row['ISO3CoO']
+                asylum = row['ISO3CoA']
+                row_key = f'{year}_{origin}_{asylum}'
+                qc_row = qc_country.get(row_key, dict())
+                qc_row['Year'] = year
+                qc_row['ISO3CoO'] = origin
+                qc_row['ISO3CoA'] = asylum
+                qc_row['CoO_name'] = Country.get_country_name_from_iso3(origin)
+                qc_row['CoA_name'] = Country.get_country_name_from_iso3(asylum)
+                attributes = list()
+                if countryiso == origin:
+                    attributes.append('outgoing')
+                if countryiso == asylum:
+                    attributes.append('incoming')
+                for attribute in attributes:
+                    for field in ['Applications', 'ASY', 'IDP', 'OOC', 'REF', 'STA', 'VDA']:
+                        value = row.get(field)
+                        if value is None:
+                            continue
+                        qc_field = f'{field}_{attribute}'
+                        qc_row[qc_field] = value
+                qc_country[row_key] = qc_row
+                qc_rows[countryiso] = qc_country
         for country_name_column in country_name_columns:
             headers.insert(3, country_name_column)
         for resource_name in resource_names:
             all_headers[resource_name] = headers
-    countries = [{'iso3': WORLD, 'countryname': 'World'}] + [{'iso3': x[0], 'countryname': x[1]} for x in sorted(list(countries))]
-    return countries, all_headers, countriesdata
+    countries = [{'iso3': WORLD, 'countryname': 'World'}] + [
+        {'iso3': x[0], 'countryname': x[1]} for x in sorted(list(countries))
+    ]
+    qc_rows[WORLD] = None
+    return countries, all_headers, countriesdata, qc_rows
 
 
-def generate_dataset_and_showcase(folder, country, countrydata, headers, resources, fields):
+def generate_dataset_and_showcase(
+    folder, country, countrydata, qc_rows, headers, resources, fields
+):
     '''
     '''
     countryiso = country['iso3']
@@ -124,7 +153,6 @@ def generate_dataset_and_showcase(folder, country, countrydata, headers, resourc
             enddate = datetime(year, 6, 30)
         else: 
             enddate = datetime(year, 12, 31)
-
         return {'startdate': startdate, 'enddate': enddate}
 
 
@@ -132,28 +160,33 @@ def generate_dataset_and_showcase(folder, country, countrydata, headers, resourc
     latest_enddate = None
     for resource_name, resource_rows in countrydata.items():
         resource_id = '_'.join(resource_name.split('_')[:-1])
-        originating_residing = resource_name.split('_')[-1] # originating or residing
+        originating_residing = resource_name.split('_')[-1]  # originating or residing
         record = resources[resource_id]
 
         if countryiso == WORLD:  # refugees and asylum applicants contain the same data for WORLD
-            if originating_residing=='originating':
+            if originating_residing == 'originating':
                 continue
         format_parameters = dict(countryiso=countryiso.lower(), countryname=countryname)
         filename = f'{resource_name}_{countryiso}.csv'
         resourcedata = {
             'name': record[originating_residing]['title'].format(**format_parameters),
-            'description': record[originating_residing]['description'].format(**format_parameters),
+            'description': record[originating_residing]['description'].format(
+                **format_parameters
+            ),
         }
-        resourcedata['name'] = resourcedata['name'].replace('residing in World', '(Global)')
+        resourcedata['name'] = resourcedata['name'].replace(
+            'residing in World', '(Global)'
+        )
 
         #        quickcharts = {
         #            'cutdown': 2,
         #            'cutdownhashtags': ['#date+year+end', '#adm1+name', '#affected+killed'],
         #        }
+        rowit = RowIterator(headers[resource_name], resource_rows).with_fields(fields)
         success, results = dataset.generate_resource_from_iterator(
-            convert_headers(headers[resource_name], fields),
-            convert_fields_in_iterator(resource_rows, fields),
-            hxltags_mapping(fields),
+            rowit.headers(),
+            rowit,
+            rowit.hxltags_mapping(),
             folder,
             filename,
             resourcedata,
@@ -175,6 +208,62 @@ def generate_dataset_and_showcase(folder, country, countrydata, headers, resourc
         logger.error(f'{countryname}  has no data!')
         return None, None
     dataset.set_dataset_date_from_datetime(earliest_startdate, latest_enddate)
+    if countryiso != WORLD:
+        filename = 'qc_data.csv'
+        resourcedata = {
+            'name': filename,
+            'description': 'QuickCharts data for %s' % countryname,
+        }
+
+        rowit = ListIterator(
+            data=list(qc_rows.values()),
+            headers=[
+                'Year',
+                'ISO3CoO',
+                'CoO_name',
+                'ISO3CoA',
+                'CoA_name',
+                'Total Incoming',
+                'Total Outgoing',
+            ],
+        ).auto_headers().to_list_iterator()
+        years = sorted(set(rowit.column('Year')))[-10:] # Last 10 years
+        headers = rowit.headers()
+        rowit = (
+            rowit
+            .select(lambda row,years=years:row.get('Year') in years) # Restrict data to only last 10 years
+            .with_sum_field(
+                'Total Incoming',
+                '#affected+resettled+incoming',
+                [x for x in headers if x.endswith('_incoming')],
+            )
+            .with_sum_field(
+                'Total Outgoing',
+                '#affected+resettled+outgoing',
+                [x for x in headers if x.endswith('_outgoing')],
+            )
+            .with_fields(fields)
+#            .sort_by('Total Outgoing', descending=True)
+        )
+        success, results = dataset.generate_resource_from_iterator(
+            rowit.headers(),
+            rowit,
+            rowit.hxltags_mapping(),
+            folder,
+            filename,
+            resourcedata,
+            date_function=process_dates,
+            #           quickcharts=quickcharts,
+        )
+        if success is False:
+            logger.warning(f'QuickChart {countryname} - {resource_name}  has no data!')
+
+        ### DEBUG:
+        #rowit.reset().to_csv(f'qc_data_{countryiso}.csv')
+
+    #        dataset.generate_resource_from_rows(
+    #            folder, filename, rows, resourcedata, list(rows[0].keys())
+    #        )
     showcase = Showcase(
         {
             'name': '%s-showcase' % slugified_name,
