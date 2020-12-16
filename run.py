@@ -34,7 +34,7 @@ def main():
 
     with Download() as downloader:
         countries, headers, countriesdata, qc_rows = get_countriesdata(
-            download_url, resources, fields, downloader
+            download_url, resources, downloader
         )
         logger.info('Number of countries: %d' % len(countriesdata))
         for info, country in progress_storing_tempdir(

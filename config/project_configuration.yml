@@ -1,6 +1,8 @@
 # Collector specific configuration
-download_url: "https://www.dropbox.com/s/9z2q521dq2vs1dx/HDX_Sample.zip?dl=0"
+# This download URL is not used, as it is overridden in run.py, but the zip file gives a useful indication of the data structure
+# download_url: "https://www.dropbox.com/s/9z2q521dq2vs1dx/HDX_Sample.zip?dl=0"
 
+# Here is the list of resources, which includes the filename, and all the relevant metadata
 resources:
   asylum_applications:
     file: HDX_AsylumApplications.csv
@@ -78,7 +80,7 @@ resources:
         originating from {countryname} availing different types of solutions for refugees and IDPs such as
         repatriation or resettlement. Data is available since 1983.
 
-
+# And then here are the list of fields
 fields:
   ASY:
     name: Asylum-seekers
