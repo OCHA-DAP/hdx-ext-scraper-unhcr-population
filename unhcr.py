@@ -27,6 +27,7 @@ WORLD = 'world'
 LATEST_YEAR = 2020
 IS_ASR = False
 
+
 def get_countriesdata(download_url, resources, downloader):
     countriesdata = {WORLD: {}}
     qc_rows = dict()
@@ -58,7 +59,7 @@ def get_countriesdata(download_url, resources, downloader):
 
         for row in iterator:
             for country_column, country_name_column, resource_name in zip(
-                country_columns, country_name_columns, resource_names
+                    country_columns, country_name_columns, resource_names
             ):
                 countryiso = row[country_column]
                 countryname = Country.get_country_name_from_iso3(countryiso)
@@ -112,7 +113,7 @@ def get_countriesdata(download_url, resources, downloader):
 
 
 def generate_dataset_and_showcase(
-    folder, country, countrydata, qc_rows, headers, resources, fields
+        folder, country, countrydata, qc_rows, headers, resources, fields
 ):
     '''
     '''
@@ -143,18 +144,16 @@ def generate_dataset_and_showcase(
     tags = ['hxl', 'refugees', 'asylum', 'population']
     dataset.add_tags(tags)
 
-
     def process_dates(row):
         year = int(row['Year'])
         startdate = datetime(year, 1, 1)
         # For mid-year data it should be 30-June...
-        #enddate = datetime(year, 12, 31)
+        # enddate = datetime(year, 12, 31)
         if (IS_ASR == False & year == LATEST_YEAR):
             enddate = datetime(year, 6, 30)
-        else: 
+        else:
             enddate = datetime(year, 12, 31)
         return {'startdate': startdate, 'enddate': enddate}
-
 
     earliest_startdate = None
     latest_enddate = None
@@ -177,11 +176,6 @@ def generate_dataset_and_showcase(
         resourcedata['name'] = resourcedata['name'].replace(
             'residing in World', '(Global)'
         )
-
-        #        quickcharts = {
-        #            'cutdown': 2,
-        #            'cutdownhashtags': ['#date+year+end', '#adm1+name', '#affected+killed'],
-        #        }
         rowit = RowIterator(headers[resource_name], resource_rows).with_fields(fields)
         success, results = dataset.generate_resource_from_iterator(
             rowit.headers(),
@@ -190,8 +184,7 @@ def generate_dataset_and_showcase(
             folder,
             filename,
             resourcedata,
-            date_function=process_dates,
-            #           quickcharts=quickcharts,
+            date_function=process_dates
         )
 
         if success is False:
@@ -223,27 +216,22 @@ def generate_dataset_and_showcase(
                 'CoO_name',
                 'ISO3CoA',
                 'CoA_name',
-                'Total Incoming',
-                'Total Outgoing',
+                'Displaced From',
+                'Displaced Stateless Within',
+                'Displaced Stateless From',
             ],
         ).auto_headers().to_list_iterator()
-        years = sorted(set(rowit.column('Year')))[-10:] # Last 10 years
+        years = sorted(set(rowit.column('Year')))[-10:]  # Last 10 years
         headers = rowit.headers()
         rowit = (
-            rowit
-            .select(lambda row,years=years:row.get('Year') in years) # Restrict data to only last 10 years
-            .with_sum_field(
-                'Total Incoming',
-                '#affected+resettled+incoming',
-                [x for x in headers if x.endswith('_incoming')],
-            )
-            .with_sum_field(
-                'Total Outgoing',
-                '#affected+resettled+outgoing',
-                [x for x in headers if x.endswith('_outgoing')],
-            )
+            rowit.select(lambda row, years=years: row.get('Year') in years)  # Restrict data to only last 10 years
+            .with_sum_field('Displaced From', '#affected+displaced+outgoing',
+                            [x for x in headers if x.startswith(('REF', 'ASY', 'VDA')) and x.endswith('_outgoing')])
+            .with_sum_field('Displaced Stateless Within', '#affected+displaced+stateless+incoming',
+                            [x for x in headers if x.startswith(('REF', 'ASY', 'IDP', 'VDA', 'STA')) and x.endswith('_incoming')])
+            .with_sum_field('Displaced Stateless From', '#affected+displaced+stateless+outgoing',
+                            [x for x in headers if x.startswith(('REF', 'ASY', 'IDP', 'VDA', 'STA')) and x.endswith('_outgoing')])
             .with_fields(fields)
-#            .sort_by('Total Outgoing', descending=True)
         )
         success, results = dataset.generate_resource_from_iterator(
             rowit.headers(),
@@ -253,17 +241,9 @@ def generate_dataset_and_showcase(
             filename,
             resourcedata,
             date_function=process_dates,
-            #           quickcharts=quickcharts,
         )
         if success is False:
-            logger.warning(f'QuickChart {countryname} - {resource_name}  has no data!')
-
-        ### DEBUG:
-        #rowit.reset().to_csv(f'qc_data_{countryiso}.csv')
-
-    #        dataset.generate_resource_from_rows(
-    #            folder, filename, rows, resourcedata, list(rows[0].keys())
-    #        )
+            logger.warning(f'QuickCharts {countryname} - {filename}  has no data!')
     showcase = Showcase(
         {
             'name': '%s-showcase' % slugified_name,

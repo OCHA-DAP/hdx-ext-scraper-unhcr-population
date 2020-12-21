@@ -16,7 +16,7 @@ from hdx.utilities.downloader import Download
 
 from hdx.utilities.path import progress_storing_tempdir
 
-from unhcr import generate_dataset_and_showcase, get_countriesdata
+from unhcr import generate_dataset_and_showcase, get_countriesdata, WORLD
 
 from hdx.facades.simple import facade
 
@@ -51,8 +51,6 @@ def main():
         for info, country in progress_storing_tempdir(
             'UNHCR_population', countries, 'iso3'
         ):
-            #if country["iso3"]!="AFG":
-            #    continue
             folder = info['folder']
 
             countryiso = country['iso3']
@@ -64,7 +62,9 @@ def main():
                 dataset['notes'] = dataset['notes'].replace(
                     '\n', '  \n'
                 )  # ensure markdown has line breaks
-                dataset.preview_off()
+                if countryiso != WORLD:
+                    resourceview = dataset.generate_resource_view(-1)
+                    resourceview['hxl_preview_config'] = resourceview['hxl_preview_config'].replace('{{#country+name}}', country['countryname'])
                 dataset.create_in_hdx(
                     remove_additional_resources=True,
                     hxl_update=False,
