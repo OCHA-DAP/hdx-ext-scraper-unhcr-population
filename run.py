@@ -4,6 +4,9 @@
 Top level script. Calls other functions that generate datasets that this script then creates in HDX.
 
 '''
+# To switch on the structure of the file paths depending on the operating system
+import sys
+
 import logging
 from os.path import join, expanduser
 from pathlib import Path
@@ -27,10 +30,18 @@ def main():
     configuration = Configuration.read()
     resources = configuration['resources']
     fields = configuration['fields']
-    # Set the download_url as a path on linux
-    download_url = Path('data').resolve().as_uri()
-    # And just as it comes on Windows
-    #download_url = '/Dropbox/UNHCR Statistics/Data/HDX/'
+  
+    # Switch on platforms as the way the download_url is consumed seems to be inconsistent
+    if (sys.platform == "win32"):
+        # And just as it comes on Windows (set in the .hdx_configuration.yml file which is outside of the project, typically in the users home directory)
+        print("Using the following data directory: ", configuration['hdx_data_directory'])
+        download_url = configuration['hdx_data_directory']
+       #'/Dropbox/UNHCR Statistics/Data/HDX/'
+    else: 
+        # Set the download_url as a path on linux
+        download_url = Path('data').resolve().as_uri()
+
+    
 
     with Download() as downloader:
         countries, headers, countriesdata, qc_rows = get_countriesdata(
