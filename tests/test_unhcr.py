@@ -78,19 +78,26 @@ class TestUNHCR:
             'ApplicationAveragePersonsPerCase': '3.3',
             'Applications': '5',
         }
-        assert len(qc_rows) == 73
-        assert qc_rows['AFG']['2019_AFG_PAK'] == {
+        assert len(qc_rows) == 1067
+        assert qc_rows['2019_AFG_PAK'] == {
             'Year': '2019',
             'ISO3CoO': 'AFG',
             'ISO3CoA': 'PAK',
             'CoO_name': 'Afghanistan',
             'CoA_name': 'Pakistan',
+            'Applications_incoming': '3545',
             'Applications_outgoing': '3545',
+            'ASY_incoming': '8406',
             'ASY_outgoing': '8406',
+            'IDP_incoming': '0',
             'IDP_outgoing': '0',
+            'OOC_incoming': '0',
             'OOC_outgoing': '0',
+            'REF_incoming': '1419084',
             'REF_outgoing': '1419084',
+            'STA_incoming': '0',
             'STA_outgoing': '0',
+            'VDA_incoming': '0',
             'VDA_outgoing': '0'
         }
 
@@ -101,7 +108,7 @@ class TestUNHCR:
             countries, headers, countriesdata, qc_rows = data
             index = [i for i, c in enumerate(countries) if c['iso3'] == 'BGD'][0]
             dataset, showcase = generate_dataset_and_showcase(
-                folder, countries[index], countriesdata['BGD'], qc_rows['BGD'], headers, resources, fields
+                folder, countries[index], countriesdata['BGD'], qc_rows, headers, resources, fields
             )
             assert dataset['name'] == 'unhcr-population-data-for-bgd'
             assert dataset['title'] == 'Bangladesh - Data on forcibly displaced populations and stateless persons'

@@ -76,12 +76,11 @@ def get_countriesdata(download_url, resources, downloader):
                     countriesdata[WORLD][resource_name] = []
                 countriesdata[countryiso][resource_name].append(row)
                 countriesdata[WORLD][resource_name].append(row)
-                qc_country = qc_rows.get(countryiso, dict())
                 year = row['Year']
                 origin = row['ISO3CoO']
                 asylum = row['ISO3CoA']
                 row_key = f'{year}_{origin}_{asylum}'
-                qc_row = qc_country.get(row_key, dict())
+                qc_row = qc_rows.get(row_key, dict())
                 qc_row['Year'] = year
                 qc_row['ISO3CoO'] = origin
                 qc_row['ISO3CoA'] = asylum
@@ -99,8 +98,7 @@ def get_countriesdata(download_url, resources, downloader):
                             continue
                         qc_field = f'{field}_{attribute}'
                         qc_row[qc_field] = value
-                qc_country[row_key] = qc_row
-                qc_rows[countryiso] = qc_country
+                qc_rows[row_key] = qc_row
         for country_name_column in country_name_columns:
             headers.insert(3, country_name_column)
         for resource_name in resource_names:
@@ -108,7 +106,6 @@ def get_countriesdata(download_url, resources, downloader):
     countries = [{'iso3': WORLD, 'countryname': 'World'}] + [
         {'iso3': x[0], 'countryname': x[1]} for x in sorted(list(countries))
     ]
-    qc_rows[WORLD] = None
     return countries, all_headers, countriesdata, qc_rows
 
 
@@ -149,7 +146,7 @@ def generate_dataset_and_showcase(
         startdate = datetime(year, 1, 1)
         # For mid-year data it should be 30-June...
         # enddate = datetime(year, 12, 31)
-        if (IS_ASR == False & year == LATEST_YEAR):
+        if IS_ASR is False and year == LATEST_YEAR:
             enddate = datetime(year, 6, 30)
         else:
             enddate = datetime(year, 12, 31)

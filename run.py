@@ -5,13 +5,14 @@ Top level script. Calls other functions that generate datasets that this script 
 
 '''
 import logging
-from os.path import join, expanduser
+from os.path import join
 from pathlib import Path
 
 from hdx.hdx_configuration import Configuration
 from hdx.utilities.downloader import Download
 
 from hdx.utilities.path import progress_storing_tempdir
+from hdx.utilities.text import multiple_replace
 
 from unhcr import generate_dataset_and_showcase, get_countriesdata, WORLD
 
@@ -44,7 +45,7 @@ def main():
 
             countryiso = country['iso3']
             dataset, showcase = generate_dataset_and_showcase(
-                folder, country, countriesdata[countryiso], qc_rows[countryiso], headers, resources, fields
+                folder, country, countriesdata[countryiso], qc_rows, headers, resources, fields
             )
             if dataset:
                 dataset.update_from_yaml()
@@ -53,7 +54,7 @@ def main():
                 )  # ensure markdown has line breaks
                 if countryiso != WORLD:
                     resourceview = dataset.generate_resource_view(-1)
-                    resourceview['hxl_preview_config'] = resourceview['hxl_preview_config'].replace('{{#country+name}}', country['countryname'])
+                    resourceview['hxl_preview_config'] = multiple_replace(resourceview['hxl_preview_config'], {'{{#country+iso}}': countryiso, '{{#country+name}}': country['countryname']})
                 dataset.create_in_hdx(
                     remove_additional_resources=True,
                     hxl_update=False,

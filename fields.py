@@ -89,13 +89,13 @@ def convert_fields_in_iterator(iterator, fields):
     """
     encoding_map, encoding_field_names = encoding(fields)
     for x in add_decoded_fields_in_iterator(
-        rename_fields_in_iterator(iterator, fields), encoding_map, encoding_field_names
+            rename_fields_in_iterator(iterator, fields), encoding_map, encoding_field_names
     ):
         yield x
 
 
 def convert_headers(headers, fields):
-    "Rename and eventually add new fields into headers using the fields structure"
+    """Rename and eventually add new fields into headers using the fields structure"""
     _, encoding_field_names = encoding(fields, use_original_field_names=True)
 
     new_headers = []
@@ -109,6 +109,7 @@ def convert_headers(headers, fields):
 
 class RowIteratorMixin(object):
     """Mixin defining RowIterator builder interface"""
+
     def headers(self):
         "List of field names of the row iterator"
         return self._headers
@@ -116,9 +117,9 @@ class RowIteratorMixin(object):
     def hxltags_mapping(self):
         "Dictionary mapping field names to hxl tags"
         return {}
-    
+
     def with_sum_field(self, field_name, hxltag="", sum_fields=[]):
-        "Create a new column fith *field_name* and *hxltag* that is a sum of *sum_fields*"
+        """Create a new column fith *field_name* and *hxltag* that is a sum of *sum_fields*"""
         return RowIteratorWithSumField(self, field_name, hxltag, sum_fields)
 
     def with_fields(self, fields):
@@ -126,26 +127,26 @@ class RowIteratorMixin(object):
         return RowIteratorWithFields(self, fields)
 
     def sort_by(self, field, descending=False):
-        headers=self.headers()
-        mapping=self.hxltags_mapping()
-        data = sorted(self, key=lambda x,f=field:x.get(f), reverse=descending)
+        headers = self.headers()
+        mapping = self.hxltags_mapping()
+        data = sorted(self, key=lambda x, f=field: x.get(f), reverse=descending)
         return ListIterator(data, headers=headers, hxltags_mapping=mapping)
 
     def to_list_iterator(self):
-        headers=self.headers()
-        mapping=self.hxltags_mapping()
+        headers = self.headers()
+        mapping = self.hxltags_mapping()
         data = list(self)
         return ListIterator(data, headers=headers, hxltags_mapping=mapping)
 
     def select(self, condition):
-        headers=self.headers()
-        mapping=self.hxltags_mapping()
+        headers = self.headers()
+        mapping = self.hxltags_mapping()
         data = [row for row in self if condition(row)]
         return ListIterator(data, headers=headers, hxltags_mapping=mapping)
 
-
     def to_csv(self, f, sep=","):
-        "Write row iterator to a file *f*, which can be a file object or a string with path."
+        """Write row iterator to a file *f*, which can be a file object or a string with path."""
+
         def cell(x):
             if type(x) is str:
                 return f'"{repr(x)[1:-1]}"'
@@ -156,15 +157,14 @@ class RowIteratorMixin(object):
                 return repr(x)
 
         if type(f) is str:
-            f=open(f,"w")
+            f = open(f, "w")
         headers = self.headers()
-        f.write(sep.join(headers)+"\n")
+        f.write(sep.join(headers) + "\n")
         mapping = self.hxltags_mapping()
-        f.write(sep.join(mapping.get(x,"") for x in headers)+"\n")
+        f.write(sep.join(mapping.get(x, "") for x in headers) + "\n")
         for row in self:
-            f.write(sep.join(cell(row.get(x,"")) for x in headers)+"\n")
+            f.write(sep.join(cell(row.get(x, "")) for x in headers) + "\n")
         f.close()
-
 
     def __iter__(self):
         return self
@@ -172,8 +172,10 @@ class RowIteratorMixin(object):
     def __next__(self):
         return next(self._iterator)
 
+
 class RowIteratorProxyMixin(RowIteratorMixin):
     """Mixin defining RowIterator builder interface"""
+
     def headers(self):
         "List of field names of the row iterator"
         return self.rowit.headers()
@@ -194,8 +196,10 @@ class RowIterator(RowIteratorMixin):
     def __init__(self, headers, iterator):
         self._headers = headers
         self._iterator = iter(iterator)
+
     def reset(self):
         raise Exception("Can't reset RowIterator based on iterator")
+
 
 class ListIterator(RowIteratorMixin):
     def __init__(self, data, headers=None, hxltags_mapping=None):
@@ -220,7 +224,7 @@ class ListIterator(RowIteratorMixin):
         By default all rows are scanned *scan_all_rows* is False,
         in which case only the first row is used. 
         """
-        extra_headers=set([])
+        extra_headers = set([])
         data = self._data if scan_all_rows else self._data[:1]
         for row in data:
             for field in row.keys():
@@ -230,8 +234,10 @@ class ListIterator(RowIteratorMixin):
         self._headers += sorted(extra_headers)
         return self
 
+
 class RowIteratorWithFields(RowIteratorMixin):
     """Row iterator doing the field conversion"""
+
     def __init__(self, rowit, fields):
         self.rowit = rowit
         self._iterator = convert_fields_in_iterator(rowit, fields)
@@ -279,7 +285,7 @@ class RowIteratorWithSumField(RowIteratorProxyMixin):
                 value += float(row.get(field, 0))
             except ValueError:
                 pass
-        if value==int(value):
-            value=int(value)
+        if value == int(value):
+            value = int(value)
         row[self.field_name] = value
         return row
