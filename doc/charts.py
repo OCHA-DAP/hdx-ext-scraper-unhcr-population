@@ -464,7 +464,7 @@ def report_population_totals(countryiso):
   <div class="container">
     <div class="row">
       <div class="col-sm">
-        <h4>Last year population totals - refuges originating from {country_name}</h4>
+        <h4>Last year population totals - refugees originating from {country_name}</h4>
         $population_totals/convert-f/filter_country-{countryiso}-originating/last_year/totals_per-Country/population_bar-Country$
       </div>
       <div class="col-sm">
