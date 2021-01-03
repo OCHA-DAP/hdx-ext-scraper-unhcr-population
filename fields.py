@@ -22,7 +22,7 @@ and finally convert_headers to convert the headers.
 def rename_fields_in_iterator(iterator, fields):
     """Rename fields in iterator.
     Function expects an iterable of dictionaries and field description.
-    Field description is a dictionary where key is the original field name and value is a dictionary optionally
+    Field description is  a dictionary where key is the original field name and value is a dictionary optionally
     containing a "name" key with the value containing the new name for the field.
     """
     for row in iterator:

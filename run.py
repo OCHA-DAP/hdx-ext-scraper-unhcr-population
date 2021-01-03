@@ -55,7 +55,7 @@ def main():
             folder = info['folder']
 
             countryiso = country['iso3']
-            dataset, showcase = generate_dataset_and_showcase(
+            dataset, showcase, bites_disabled = generate_dataset_and_showcase(
                 folder, country, countriesdata[countryiso], qc_rows, headers, resources, fields
             )
             if dataset:
@@ -63,8 +63,8 @@ def main():
                 dataset['notes'] = dataset['notes'].replace(
                     '\n', '  \n'
                 )  # ensure markdown has line breaks
-                if countryiso != WORLD:
-                    resourceview = dataset.generate_resource_view(-1)
+                resourceview = dataset.generate_resource_view(-1, bites_disabled=bites_disabled)
+                if resourceview:
                     resourceview['hxl_preview_config'] = multiple_replace(resourceview['hxl_preview_config'], {'{{#country+iso}}': countryiso, '{{#country+name}}': country['countryname']})
                 dataset.create_in_hdx(
                     remove_additional_resources=True,
