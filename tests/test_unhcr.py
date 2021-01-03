@@ -107,7 +107,7 @@ class TestUNHCR:
             fields = configuration['fields']
             countries, headers, countriesdata, qc_rows = data
             index = [i for i, c in enumerate(countries) if c['iso3'] == 'BGD'][0]
-            dataset, showcase = generate_dataset_and_showcase(
+            dataset, showcase, bites_disabled = generate_dataset_and_showcase(
                 folder, countries[index], countriesdata['BGD'], qc_rows, headers, resources, fields
             )
             assert dataset['name'] == 'unhcr-population-data-for-bgd'
@@ -117,3 +117,5 @@ class TestUNHCR:
             assert len(resources) == 5  # should be 10 if all data is available
 
             assert showcase['name'] == 'unhcr-population-data-for-bgd-showcase'
+
+            assert bites_disabled == [False, True, True]
