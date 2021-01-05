@@ -136,7 +136,7 @@ def generate_dataset_and_showcase(
             dataset.add_country_location(countryiso)
         except HDXError:
             logger.error(f'{countryname} ({countryiso})  not recognised!')
-            return None, None
+            return None, None, None
 
     tags = ['hxl', 'refugees', 'asylum', 'population']
     dataset.add_tags(tags)
@@ -196,7 +196,7 @@ def generate_dataset_and_showcase(
 
     if len(dataset.get_resources()) == 0:
         logger.error(f'{countryname}  has no data!')
-        return None, None
+        return None, None, None
     dataset.set_dataset_date_from_datetime(earliest_startdate, latest_enddate)
     bites_disabled = [True, True, True]
     if countryiso != WORLD:
