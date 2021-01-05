@@ -198,6 +198,7 @@ def generate_dataset_and_showcase(
         logger.error(f'{countryname}  has no data!')
         return None, None
     dataset.set_dataset_date_from_datetime(earliest_startdate, latest_enddate)
+    bites_disabled = [True, True, True]
     if countryiso != WORLD:
         filename = 'qc_data.csv'
         resourcedata = {
@@ -230,6 +231,18 @@ def generate_dataset_and_showcase(
                             [x for x in headers if x.startswith(('REF', 'ASY', 'IDP', 'VDA', 'STA')) and x.endswith('_outgoing')])
             .with_fields(fields)
         )
+
+        for row in rowit:
+            if row['Country of Origin Code'] == countryiso and row['Displaced From'] > 0:
+                bites_disabled[0] = False
+            if row['Year'] != years[-1]:
+                continue
+            if row['Country of Asylum Code'] == countryiso and row['Displaced Stateless Within'] > 0:
+                bites_disabled[1] = False
+            if row['Country of Origin Code'] == countryiso and row['Displaced Stateless From'] > 0:
+                bites_disabled[2] = False
+
+        rowit.reset()
         success, results = dataset.generate_resource_from_iterator(
             rowit.headers(),
             rowit,
@@ -251,4 +264,4 @@ def generate_dataset_and_showcase(
         }
     )
     showcase.add_tags(tags)
-    return dataset, showcase
+    return dataset, showcase, bites_disabled
