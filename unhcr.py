@@ -128,6 +128,7 @@ def generate_dataset_and_showcase(
     dataset.set_organization('abf4ca86-8e69-40b1-92f7-71509992be88')
     dataset.set_expected_update_frequency('Every year')
     dataset.set_subnational(True)
+    bites_disabled = [True, True, True]
     if countryiso == WORLD:
         dataset.add_other_location('world')
     else:
@@ -136,7 +137,7 @@ def generate_dataset_and_showcase(
             dataset.add_country_location(countryiso)
         except HDXError:
             logger.error(f'{countryname} ({countryiso})  not recognised!')
-            return None, None, None
+            return None, None, bites_disabled
 
     tags = ['hxl', 'refugees', 'asylum', 'population']
     dataset.add_tags(tags)
@@ -196,9 +197,8 @@ def generate_dataset_and_showcase(
 
     if len(dataset.get_resources()) == 0:
         logger.error(f'{countryname}  has no data!')
-        return None, None, None
+        return None, None, bites_disabled
     dataset.set_dataset_date_from_datetime(earliest_startdate, latest_enddate)
-    bites_disabled = [True, True, True]
     if countryiso != WORLD:
         filename = 'qc_data.csv'
         resourcedata = {
