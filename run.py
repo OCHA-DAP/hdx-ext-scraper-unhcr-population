@@ -21,6 +21,9 @@ from unhcr import generate_dataset_and_showcase, get_countriesdata, WORLD
 
 from hdx.facades.simple import facade
 
+# Added Dec-2020
+from os import getenv
+
 logger = logging.getLogger(__name__)
 
 lookup = 'hdx-scraper-unhcr-population'
@@ -31,7 +34,11 @@ def main():
     configuration = Configuration.read()
     resources = configuration['resources']
     fields = configuration['fields']
+
   
+    # print out the WHERE TO START Parameter
+    print( "Starting at country (WHERETOSTART): ", getenv("WHERETOSTART") )
+
     # Switch on platforms as the way the download_url is consumed seems to be inconsistent
     if (sys.platform == "win32"):
         # And just as it comes on Windows (set in the .hdx_configuration.yml file which is outside of the project, typically in the users home directory)
