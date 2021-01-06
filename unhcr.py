@@ -6,6 +6,8 @@ UNHCR:
 
 Generates HXlated API urls from the UNHCR data.
 
+See: https://github.com/orest-d/hdx-scraper-unhcr-population/tree/master
+
 '''
 import logging
 from datetime import datetime
