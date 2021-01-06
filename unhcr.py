@@ -27,7 +27,7 @@ WORLD = 'world'
 LATEST_YEAR = 2020
 IS_ASR = False
 
-
+#-----------------------------------------------------------------------------------------------------------------------------------------------------
 def get_countriesdata(download_url, resources, downloader):
     countriesdata = {WORLD: {}}
     qc_rows = dict()
@@ -108,7 +108,7 @@ def get_countriesdata(download_url, resources, downloader):
     ]
     return countries, all_headers, countriesdata, qc_rows
 
-
+#-----------------------------------------------------------------------------------------------------------------------------------------------------
 def generate_dataset_and_showcase(
         folder, country, countrydata, qc_rows, headers, resources, fields
 ):
@@ -126,7 +126,7 @@ def generate_dataset_and_showcase(
     dataset = Dataset({'name': slugified_name, 'title': title})
     dataset.set_maintainer('8d70b12b-7247-48d2-b426-dbb4bf82eb7c')
     dataset.set_organization('abf4ca86-8e69-40b1-92f7-71509992be88')
-    dataset.set_expected_update_frequency('Every year')
+    dataset.set_expected_update_frequency('Every six months')
     dataset.set_subnational(True)
     if countryiso == WORLD:
         dataset.add_other_location('world')
@@ -140,6 +140,10 @@ def generate_dataset_and_showcase(
 
     tags = ['hxl', 'refugees', 'asylum', 'population']
     dataset.add_tags(tags)
+
+    # Filter the quick chart data to only include the relevant data for the current country
+    qcRowSubset = SubsetQuickChartData(country, qc_rows)
+
 
     def process_dates(row):
         year = int(row['Year'])
@@ -207,7 +211,7 @@ def generate_dataset_and_showcase(
         }
 
         rowit = ListIterator(
-            data=list(qc_rows.values()),
+            data=list(qcRowSubset.values()),
             headers=[
                 'Year',
                 'ISO3CoO',
@@ -265,3 +269,33 @@ def generate_dataset_and_showcase(
     )
     showcase.add_tags(tags)
     return dataset, showcase, bites_disabled
+
+
+
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+def SubsetQuickChartData(
+        country, qc_rows
+):
+    '''
+    Creates a subset of the quick chart data for a specific country.  The subset includes all those rows containing
+    the given country either as the origin or as the country of asylum.
+    '''
+    countryISO = country['iso3']
+    countryName = country['countryname']
+
+    # The new dictionary to store the subset of the data
+    qcRowSubset = dict()
+    
+    # If this is the global dataset, return all, otherwise continue to filter by origin and asylum values
+    # This should not be necessary as the call to this function is after the switch on world / non-world, but it makes sense to keep it.
+    if countryISO == WORLD:
+        qcRowSubset = qc_rows
+    else:
+        # filter the data by iterating though the values
+        for key, value in qc_rows.items():            
+            if value["ISO3CoO"] == countryISO or value["ISO3CoA"] == countryISO:
+                qcRowSubset[key] = value
+    
+    return qcRowSubset
+
+
