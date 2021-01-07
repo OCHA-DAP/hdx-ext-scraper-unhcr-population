@@ -6,7 +6,13 @@ UNHCR:
 
 Generates HXlated API urls from the UNHCR data.
 
-See: https://github.com/orest-d/hdx-scraper-unhcr-population/tree/master
+See: https://github.com/OCHA-DAP/hdx-scraper-unhcr-population 
+(formerly): https://github.com/orest-d/hdx-scraper-unhcr-population/tree/master
+Output examples: 
+Aruba: https://feature.data-humdata-org.ahconu.org/dataset/unhcr-population-data-for-abw
+Afghanistan: https://feature.data-humdata-org.ahconu.org/dataset/unhcr-population-data-for-afg
+Andorra: https://feature.data-humdata-org.ahconu.org/dataset/unhcr-population-data-for-and
+Anguilla: https://feature.data-humdata-org.ahconu.org/dataset/unhcr-population-data-for-aia
 
 '''
 import logging
