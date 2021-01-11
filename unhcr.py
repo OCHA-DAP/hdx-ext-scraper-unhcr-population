@@ -297,6 +297,7 @@ def SubsetQuickChartData(
     # If this is the global dataset, return all, otherwise continue to filter by origin and asylum values
     # This should not be necessary as the call to this function is after the switch on world / non-world, but it makes sense to keep it.
     if countryISO == WORLD:
+        print('Special case - processing the world')
         qcRowSubset = qc_rows
     else:
         # filter the data by iterating though the values
@@ -304,6 +305,8 @@ def SubsetQuickChartData(
             if value["ISO3CoO"] == countryISO or value["ISO3CoA"] == countryISO:
                 qcRowSubset[key] = value
     
+    print("Filtered ", countryISO, " to ", len(qcRowSubset), " rows")
+
     return qcRowSubset
 
 
