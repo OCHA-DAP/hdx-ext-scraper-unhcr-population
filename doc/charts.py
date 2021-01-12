@@ -23,6 +23,9 @@ import os.path
 from hdx.location.country import Country
 import plotly.express as px
 
+# Use the extended method to cater for non-standard UNHCR ISO codes (STA, UKN etc.)
+from unhcr import Get_Country_Name_From_ISO3_Extended
+
 app = Flask(__name__)
 logging.basicConfig()
 logger = logging.getLogger(__name__)
@@ -94,7 +97,8 @@ def countries():
         countries.update(df.ISO3CoA)
     countries = sorted(countries)
     countrynames = [
-        Country.get_country_name_from_iso3(countryiso) for countryiso in countries
+#        Country.get_country_name_from_iso3(countryiso) for countryiso in countries
+        Get_Country_Name_From_ISO3_Extended(countryiso) for countryiso in countries        
     ]
     return pd.DataFrame(dict(iso3=countries, country=countrynames))
 

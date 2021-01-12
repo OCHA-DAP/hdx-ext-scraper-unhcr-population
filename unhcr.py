@@ -70,7 +70,8 @@ def get_countriesdata(download_url, resources, downloader):
                     country_columns, country_name_columns, resource_names
             ):
                 countryiso = row[country_column]
-                countryname = Country.get_country_name_from_iso3(countryiso)
+#                countryname = Country.get_country_name_from_iso3(countryiso)
+                countryname = Get_Country_Name_From_ISO3_Extended(countryiso)
                 logger.info(
                     f'Processing {countryiso} - {countryname}, resource {resource_name}'
                 )
@@ -91,9 +92,11 @@ def get_countriesdata(download_url, resources, downloader):
                 qc_row = qc_rows.get(row_key, dict())
                 qc_row['Year'] = year
                 qc_row['ISO3CoO'] = origin
-                qc_row['ISO3CoA'] = asylum
-                qc_row['CoO_name'] = Country.get_country_name_from_iso3(origin)
-                qc_row['CoA_name'] = Country.get_country_name_from_iso3(asylum)
+                qc_row['ISO3CoA'] = asylum                
+                qc_row['CoO_name'] = Get_Country_Name_From_ISO3_Extended(origin)
+                qc_row['CoA_name'] = Get_Country_Name_From_ISO3_Extended(asylum)
+                #qc_row['CoO_name'] = Country.get_country_name_from_iso3(origin)
+                #qc_row['CoA_name'] = Country.get_country_name_from_iso3(asylum)
                 attributes = list()
                 if countryiso == origin:
                     attributes.append('outgoing')
@@ -310,3 +313,28 @@ def SubsetQuickChartData(
     return qcRowSubset
 
 
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+def Get_Country_Name_From_ISO3_Extended(
+        countryISO
+):
+    '''
+    Creates a subset of the quick chart data for a specific country.  The subset includes all those rows containing
+    the given country either as the origin or as the country of asylum.
+    '''
+
+    countryName = Country.get_country_name_from_iso3(countryISO)
+
+    if (countryName == None or countryName == ""):
+        
+        print("Non-standard ISO code:", countryISO)
+
+        if(countryISO == "UKN"):
+            countryName = "Various / unknown"
+        elif (countryISO == "STA"):
+            countryName = "Stateless"
+        elif (countryISO == "TIB"):
+            countryName = "Tibetan"
+        else:
+            print("Unknown ISO code identified:", countryISO)
+
+    return countryName
