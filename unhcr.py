@@ -108,7 +108,7 @@ def get_countriesdata(download_url, resources, downloader):
                         if value is None:
                             continue
                         qc_field = f'{field}_{attribute}'
-                        qc_row[qc_field] = value / 1000000
+                        qc_row[qc_field] = value
                 qc_rows[row_key] = qc_row
         for country_name_column in country_name_columns:
             headers.insert(3, country_name_column)
@@ -212,7 +212,7 @@ def generate_dataset_and_showcase(
     if len(dataset.get_resources()) == 0:
         logger.error(f'{countryname}  has no data!')
         return None, None, None
-    dataset.set_dataset_date_from_datetime(earliest_startdate, latest_enddate)
+    dataset.set_date_of_dataset(earliest_startdate, latest_enddate)
     bites_disabled = [True, True, True]
     if countryiso != WORLD:
         filename = 'qc_data.csv'
