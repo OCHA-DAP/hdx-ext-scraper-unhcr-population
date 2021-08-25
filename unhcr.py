@@ -108,7 +108,7 @@ def get_countriesdata(download_url, resources, downloader):
                         if value is None:
                             continue
                         qc_field = f'{field}_{attribute}'
-                        qc_row[qc_field] = value
+                        qc_row[qc_field] = value / 1000000
                 qc_rows[row_key] = qc_row
         for country_name_column in country_name_columns:
             headers.insert(3, country_name_column)
