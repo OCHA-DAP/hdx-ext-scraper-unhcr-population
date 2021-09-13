@@ -1,5 +1,5 @@
 import pytest
-import yaml
+from ruamel.yaml import YAML
 
 from fields import (
     RowIterator,
@@ -15,7 +15,7 @@ from fields import (
 class TestFields:
     @pytest.fixture
     def fields(self):
-        return yaml.load(
+        return YAML().load(
             """
 fields:
   field1:
@@ -28,9 +28,7 @@ fields:
       tags: "#indicator+name"
       map:
         f2val1: f2val1 mapped
-        """,
-            Loader=yaml.FullLoader,
-        )["fields"]
+        """)["fields"]
 
     @pytest.fixture
     def iterator(self):
