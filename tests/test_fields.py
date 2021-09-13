@@ -1,14 +1,15 @@
 import pytest
+import yaml
+
 from fields import (
-    rename_fields_in_iterator,
-    encoding,
-    hxltags_mapping,
+    RowIterator,
     add_decoded_fields_in_iterator,
     convert_fields_in_iterator,
     convert_headers,
-    RowIterator,
+    encoding,
+    hxltags_mapping,
+    rename_fields_in_iterator,
 )
-import yaml
 
 
 class TestFields:
