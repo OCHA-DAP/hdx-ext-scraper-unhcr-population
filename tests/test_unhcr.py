@@ -8,8 +8,8 @@ from pathlib import Path
 
 import pytest
 from hdx.data.vocabulary import Vocabulary
-from hdx.hdx_configuration import Configuration
-from hdx.hdx_locations import Locations
+from hdx.api.configuration import Configuration
+from hdx.api.locations import Locations
 from hdx.location.country import Country
 from hdx.utilities.downloader import Download
 from hdx.utilities.path import temp_dir
