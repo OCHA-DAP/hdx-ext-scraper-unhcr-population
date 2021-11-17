@@ -1,6 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
-'''
+"""
 UNHCR:
 -----
 
@@ -14,21 +13,22 @@ Afghanistan: https://feature.data-humdata-org.ahconu.org/dataset/unhcr-populatio
 Andorra: https://feature.data-humdata-org.ahconu.org/dataset/unhcr-population-data-for-and
 Anguilla: https://feature.data-humdata-org.ahconu.org/dataset/unhcr-population-data-for-aia
 
-'''
+"""
 import logging
 from datetime import datetime
+from urllib.parse import urljoin
 
 from hdx.data.dataset import Dataset
 from hdx.data.hdxobject import HDXError
 from hdx.data.showcase import Showcase
 from hdx.location.country import Country
 from slugify import slugify
-from urllib.parse import urljoin
-from fields import RowIterator, ListIterator
+
+from fields import ListIterator, RowIterator
 
 logger = logging.getLogger(__name__)
 
-WORLD = 'world'
+WORLD = "world"
 
 # Dec-2020 - add a switch for the latest year and if the data is ASR or MYSR
 # If MYSR, then the date in the latest year should be 30-June not 31-Dec
@@ -40,31 +40,31 @@ IS_ASR = False
 
 # The data is sourced from....
 
-#-----------------------------------------------------------------------------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------------------------------------------------------------------------------
 def get_countriesdata(download_url, resources, downloader):
     countriesdata = {WORLD: {}}
     qc_rows = dict()
     countries = set()
-    if not download_url.endswith('/'):
-        download_url += '/'
+    if not download_url.endswith("/"):
+        download_url += "/"
 
     all_headers = {}
     for name, record in resources.items():
-        filename = record['file']
+        filename = record["file"]
         specific_download_url = urljoin(download_url, filename)
         headers, iterator = downloader.get_tabular_rows(
             specific_download_url, headers=1, dict_form=True
         )
         country_columns = sorted(
-            set(column for column in headers if column in ['ISO3CoO', 'ISO3CoA'])
+            {column for column in headers if column in ["ISO3CoO", "ISO3CoA"]}
         )
         country_name_columns = [
-            country_column.replace('ISO3', '') + '_name'
+            country_column.replace("ISO3", "") + "_name"
             for country_column in country_columns
         ]
         resource_names = [
-            f'{name}_'
-            + dict(ISO3CoO='originating', ISO3CoA='residing').get(
+            f"{name}_"
+            + dict(ISO3CoO="originating", ISO3CoA="residing").get(
                 country_column, country_column
             )
             for country_column in country_columns
@@ -72,13 +72,13 @@ def get_countriesdata(download_url, resources, downloader):
 
         for row in iterator:
             for country_column, country_name_column, resource_name in zip(
-                    country_columns, country_name_columns, resource_names
+                country_columns, country_name_columns, resource_names
             ):
                 countryiso = row[country_column]
-#                countryname = Country.get_country_name_from_iso3(countryiso)
+                #                countryname = Country.get_country_name_from_iso3(countryiso)
                 countryname = Get_Country_Name_From_ISO3_Extended(countryiso)
                 logger.info(
-                    f'Processing {countryiso} - {countryname}, resource {resource_name}'
+                    f"Processing {countryiso} - {countryname}, resource {resource_name}"
                 )
                 countries.add((countryiso, countryname))
                 row[country_name_column] = countryname
@@ -90,79 +90,86 @@ def get_countriesdata(download_url, resources, downloader):
                     countriesdata[WORLD][resource_name] = []
                 countriesdata[countryiso][resource_name].append(row)
                 countriesdata[WORLD][resource_name].append(row)
-                year = row['Year']
-                origin = row['ISO3CoO']
-                asylum = row['ISO3CoA']
-                row_key = f'{year}_{origin}_{asylum}'
+                year = row["Year"]
+                origin = row["ISO3CoO"]
+                asylum = row["ISO3CoA"]
+                row_key = f"{year}_{origin}_{asylum}"
                 qc_row = qc_rows.get(row_key, dict())
-                qc_row['Year'] = year
-                qc_row['ISO3CoO'] = origin
-                qc_row['ISO3CoA'] = asylum                
-                qc_row['CoO_name'] = Get_Country_Name_From_ISO3_Extended(origin)
-                qc_row['CoA_name'] = Get_Country_Name_From_ISO3_Extended(asylum)
-                #qc_row['CoO_name'] = Country.get_country_name_from_iso3(origin)
-                #qc_row['CoA_name'] = Country.get_country_name_from_iso3(asylum)
+                qc_row["Year"] = year
+                qc_row["ISO3CoO"] = origin
+                qc_row["ISO3CoA"] = asylum
+                qc_row["CoO_name"] = Get_Country_Name_From_ISO3_Extended(origin)
+                qc_row["CoA_name"] = Get_Country_Name_From_ISO3_Extended(asylum)
+                # qc_row['CoO_name'] = Country.get_country_name_from_iso3(origin)
+                # qc_row['CoA_name'] = Country.get_country_name_from_iso3(asylum)
                 attributes = list()
                 if countryiso == origin:
-                    attributes.append('outgoing')
+                    attributes.append("outgoing")
                 if countryiso == asylum:
-                    attributes.append('incoming')
+                    attributes.append("incoming")
                 for attribute in attributes:
-                    for field in ['Applications', 'ASY', 'IDP', 'OOC', 'REF', 'STA', 'VDA']:
+                    for field in [
+                        "Applications",
+                        "ASY",
+                        "IDP",
+                        "OOC",
+                        "REF",
+                        "STA",
+                        "VDA",
+                    ]:
                         value = row.get(field)
                         if value is None:
                             continue
-                        qc_field = f'{field}_{attribute}'
+                        qc_field = f"{field}_{attribute}"
                         qc_row[qc_field] = value
                 qc_rows[row_key] = qc_row
         for country_name_column in country_name_columns:
             headers.insert(3, country_name_column)
         for resource_name in resource_names:
             all_headers[resource_name] = headers
-    countries = [{'iso3': WORLD, 'countryname': 'World'}] + [
-        {'iso3': x[0], 'countryname': x[1]} for x in sorted(list(countries))
+    countries = [{"iso3": WORLD, "countryname": "World"}] + [
+        {"iso3": x[0], "countryname": x[1]} for x in sorted(list(countries))
     ]
     return countries, all_headers, countriesdata, qc_rows
 
-#-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+# -----------------------------------------------------------------------------------------------------------------------------------------------------
 def generate_dataset_and_showcase(
-        folder, country, countrydata, qc_rows, headers, resources, fields
+    folder, country, countrydata, qc_rows, headers, resources, fields
 ):
-    '''
-    '''
-    countryiso = country['iso3']
-    countryname = country['countryname']
-    title_text = 'Data on forcibly displaced populations and stateless persons'
-    if countryname == 'World':
-        title = f'{title_text} (Global)'
+    """ """
+    countryiso = country["iso3"]
+    countryname = country["countryname"]
+    title_text = "Data on forcibly displaced populations and stateless persons"
+    if countryname == "World":
+        title = f"{title_text} (Global)"
     else:
-        title = f'{countryname} - {title_text}'
-    logger.info('Creating dataset: %s' % title)
-    slugified_name = slugify('UNHCR Population Data for %s' % countryiso).lower()
-    dataset = Dataset({'name': slugified_name, 'title': title})
-    dataset.set_maintainer('8d70b12b-7247-48d2-b426-dbb4bf82eb7c')
-    dataset.set_organization('abf4ca86-8e69-40b1-92f7-71509992be88')
-    dataset.set_expected_update_frequency('Every six months')
+        title = f"{countryname} - {title_text}"
+    logger.info(f"Creating dataset: {title}")
+    slugified_name = slugify(f"UNHCR Population Data for {countryiso}").lower()
+    dataset = Dataset({"name": slugified_name, "title": title})
+    dataset.set_maintainer("8d70b12b-7247-48d2-b426-dbb4bf82eb7c")
+    dataset.set_organization("abf4ca86-8e69-40b1-92f7-71509992be88")
+    dataset.set_expected_update_frequency("Every six months")
     dataset.set_subnational(True)
     if countryiso == WORLD:
-        dataset.add_other_location('world')
+        dataset.add_other_location("world")
     else:
         # Check for unknown country names
         try:
             dataset.add_country_location(countryiso)
         except HDXError:
-            logger.error(f'{countryname} ({countryiso})  not recognised!')
+            logger.error(f"{countryname} ({countryiso})  not recognised!")
             return None, None, None
 
-    tags = ['hxl', 'refugees', 'asylum', 'population']
+    tags = ["hxl", "refugees", "asylum", "population"]
     dataset.add_tags(tags)
 
     # Filter the quick chart data to only include the relevant data for the current country
     qcRowSubset = SubsetQuickChartData(country, qc_rows)
 
-
     def process_dates(row):
-        year = int(row['Year'])
+        year = int(row["Year"])
         startdate = datetime(year, 1, 1)
         # For mid-year data it should be 30-June...
         # enddate = datetime(year, 12, 31)
@@ -170,28 +177,30 @@ def generate_dataset_and_showcase(
             enddate = datetime(year, 6, 30)
         else:
             enddate = datetime(year, 12, 31)
-        return {'startdate': startdate, 'enddate': enddate}
+        return {"startdate": startdate, "enddate": enddate}
 
     earliest_startdate = None
     latest_enddate = None
     for resource_name, resource_rows in countrydata.items():
-        resource_id = '_'.join(resource_name.split('_')[:-1])
-        originating_residing = resource_name.split('_')[-1]  # originating or residing
+        resource_id = "_".join(resource_name.split("_")[:-1])
+        originating_residing = resource_name.split("_")[-1]  # originating or residing
         record = resources[resource_id]
 
-        if countryiso == WORLD:  # refugees and asylum applicants contain the same data for WORLD
-            if originating_residing == 'originating':
+        if (
+            countryiso == WORLD
+        ):  # refugees and asylum applicants contain the same data for WORLD
+            if originating_residing == "originating":
                 continue
         format_parameters = dict(countryiso=countryiso.lower(), countryname=countryname)
-        filename = f'{resource_name}_{countryiso}.csv'
+        filename = f"{resource_name}_{countryiso}.csv"
         resourcedata = {
-            'name': record[originating_residing]['title'].format(**format_parameters),
-            'description': record[originating_residing]['description'].format(
+            "name": record[originating_residing]["title"].format(**format_parameters),
+            "description": record[originating_residing]["description"].format(
                 **format_parameters
             ),
         }
-        resourcedata['name'] = resourcedata['name'].replace(
-            'residing in World', '(Global)'
+        resourcedata["name"] = resourcedata["name"].replace(
+            "residing in World", "(Global)"
         )
         rowit = RowIterator(headers[resource_name], resource_rows).with_fields(fields)
         success, results = dataset.generate_resource_from_iterator(
@@ -201,65 +210,103 @@ def generate_dataset_and_showcase(
             folder,
             filename,
             resourcedata,
-            date_function=process_dates
+            date_function=process_dates,
         )
 
         if success is False:
-            logger.warning(f'{countryname} - {resource_name}  has no data!')
+            logger.warning(f"{countryname} - {resource_name}  has no data!")
         else:
-            startdate = results['startdate']
+            startdate = results["startdate"]
             if earliest_startdate is None or startdate < earliest_startdate:
                 earliest_startdate = startdate
-            enddate = results['enddate']
+            enddate = results["enddate"]
             if latest_enddate is None or enddate > latest_enddate:
                 latest_enddate = enddate
 
     if len(dataset.get_resources()) == 0:
-        logger.error(f'{countryname}  has no data!')
+        logger.error(f"{countryname}  has no data!")
         return None, None, None
-    dataset.set_dataset_date_from_datetime(earliest_startdate, latest_enddate)
+    dataset.set_date_of_dataset(earliest_startdate, latest_enddate)
     bites_disabled = [True, True, True]
     if countryiso != WORLD:
-        filename = 'qc_data.csv'
+        filename = "qc_data.csv"
         resourcedata = {
-            'name': filename,
-            'description': 'QuickCharts data for %s' % countryname,
+            "name": filename,
+            "description": f"QuickCharts data for {countryname}",
         }
 
-        rowit = ListIterator(
-            data=list(qcRowSubset.values()),
-            headers=[
-                'Year',
-                'ISO3CoO',
-                'CoO_name',
-                'ISO3CoA',
-                'CoA_name',
-                'Displaced From',
-                'Displaced Stateless Within',
-                'Displaced Stateless From',
-            ],
-        ).auto_headers().to_list_iterator()
-        years = sorted(set(rowit.column('Year')))[-10:]  # Last 10 years
+        rowit = (
+            ListIterator(
+                data=list(qcRowSubset.values()),
+                headers=[
+                    "Year",
+                    "ISO3CoO",
+                    "CoO_name",
+                    "ISO3CoA",
+                    "CoA_name",
+                    "Displaced From",
+                    "Displaced Stateless Within",
+                    "Displaced Stateless From",
+                ],
+            )
+            .auto_headers()
+            .to_list_iterator()
+        )
+        years = sorted(set(rowit.column("Year")))[-10:]  # Last 10 years
         headers = rowit.headers()
         rowit = (
-            rowit.select(lambda row, years=years: row.get('Year') in years)  # Restrict data to only last 10 years
-            .with_sum_field('Displaced From', '#affected+displaced+outgoing',
-                            [x for x in headers if x.startswith(('REF', 'ASY', 'VDA')) and x.endswith('_outgoing')])
-            .with_sum_field('Displaced Stateless Within', '#affected+displaced+stateless+incoming',
-                            [x for x in headers if x.startswith(('REF', 'ASY', 'IDP', 'VDA', 'STA')) and x.endswith('_incoming')])
-            .with_sum_field('Displaced Stateless From', '#affected+displaced+stateless+outgoing',
-                            [x for x in headers if x.startswith(('REF', 'ASY', 'IDP', 'VDA', 'STA')) and x.endswith('_outgoing')])
+            rowit.select(
+                lambda row, years=years: row.get("Year") in years
+            )  # Restrict data to only last 10 years
+            .with_sum_field(
+                "Displaced From",
+                "#affected+displaced+outgoing",
+                [
+                    x
+                    for x in headers
+                    if x.startswith(("REF", "ASY", "VDA")) and x.endswith("_outgoing")
+                ],
+            )
+            .with_sum_field(
+                "Displaced Stateless Within",
+                "#affected+displaced+stateless+incoming",
+                [
+                    x
+                    for x in headers
+                    if x.startswith(("REF", "ASY", "IDP", "VDA", "STA"))
+                    and x.endswith("_incoming")
+                ],
+            )
+            .with_sum_field(
+                "Displaced Stateless From",
+                "#affected+displaced+stateless+outgoing",
+                [
+                    x
+                    for x in headers
+                    if x.startswith(("REF", "ASY", "IDP", "VDA", "STA"))
+                    and x.endswith("_outgoing")
+                ],
+            )
             .with_fields(fields)
         )
 
         for row in rowit:
-            if row['Country of Origin Code'] == countryiso and row['Displaced From'] > 0:
+            if (
+                row["Country of Origin Code"] == countryiso
+                and row["Displaced From"] > 0
+            ):
                 bites_disabled[0] = False
-            if row['Year'] != years[-1]:
+            if row["Year"] != years[-1]:
                 continue
-            if row['Country of Asylum Code'] == countryiso and row['Displaced Stateless Within'] > 0:
+            if (
+                row["Country of Asylum Code"] == countryiso
+                and row["Displaced Stateless Within"] > 0
+            ):
                 bites_disabled[1] = False
-            if row['Country of Origin Code'] == countryiso and row['Displaced Stateless From'] > 0:
+            if (
+                row["Country of Origin Code"] == countryiso
+                and row["Displaced Stateless From"] > 0
+            ):
                 bites_disabled[2] = False
 
         rowit.reset()
@@ -273,71 +320,66 @@ def generate_dataset_and_showcase(
             date_function=process_dates,
         )
         if success is False:
-            logger.warning(f'QuickCharts {countryname} - {filename}  has no data!')
+            logger.warning(f"QuickCharts {countryname} - {filename}  has no data!")
     showcase = Showcase(
         {
-            'name': '%s-showcase' % slugified_name,
-            'title': title,
-            'notes': 'UNHCR Population Data Dashboard for %s' % countryname,
-            'url': 'https://www.unhcr.org/refugee-statistics/',
-            'image_url': 'https://www.unhcr.org/assets/img/unhcr-logo.png',
+            "name": f"{slugified_name}-showcase",
+            "title": title,
+            "notes": f"UNHCR Population Data Dashboard for {countryname}",
+            "url": "https://www.unhcr.org/refugee-statistics/",
+            "image_url": "https://www.unhcr.org/assets/img/unhcr-logo.png",
         }
     )
     showcase.add_tags(tags)
     return dataset, showcase, bites_disabled
 
 
-
-#-------------------------------------------------------------------------------------------------------------------------------------------------------------------
-def SubsetQuickChartData(
-        country, qc_rows
-):
-    '''
+# -------------------------------------------------------------------------------------------------------------------------------------------------------------------
+def SubsetQuickChartData(country, qc_rows):
+    """
     Creates a subset of the quick chart data for a specific country.  The subset includes all those rows containing
     the given country either as the origin or as the country of asylum.
-    '''
-    countryISO = country['iso3']
-    countryName = country['countryname']
+    """
+    countryISO = country["iso3"]
+    country["countryname"]
 
     # The new dictionary to store the subset of the data
     qcRowSubset = dict()
-    
+
     # If this is the global dataset, return all, otherwise continue to filter by origin and asylum values
     # This should not be necessary as the call to this function is after the switch on world / non-world, but it makes sense to keep it.
     if countryISO == WORLD:
-        print('Special case - processing the world')
+        print("Special case - processing the world")
         qcRowSubset = qc_rows
     else:
         # filter the data by iterating though the values
-        for key, value in qc_rows.items():            
+        for key, value in qc_rows.items():
             if value["ISO3CoO"] == countryISO or value["ISO3CoA"] == countryISO:
                 qcRowSubset[key] = value
-    
+
     print("Filtered ", countryISO, " to ", len(qcRowSubset), " rows")
 
     return qcRowSubset
 
 
-#-------------------------------------------------------------------------------------------------------------------------------------------------------------------
-def Get_Country_Name_From_ISO3_Extended(
-        countryISO
-):
-    '''
+# -------------------------------------------------------------------------------------------------------------------------------------------------------------------
+def Get_Country_Name_From_ISO3_Extended(countryISO):
+    """
     Creates a subset of the quick chart data for a specific country.  The subset includes all those rows containing
     the given country either as the origin or as the country of asylum.
-    '''
+    """
 
     countryName = Country.get_country_name_from_iso3(countryISO)
 
-    if (countryName == None or countryName == ""):
-        
+    if countryName is None or countryName == "":
+
         print("Non-standard ISO code:", countryISO)
 
-        if(countryISO == "UKN"):
+        if countryISO == "UKN":
             countryName = "Various / unknown"
-        elif (countryISO == "STA"):
+        elif countryISO == "STA":
             countryName = "Stateless"
-        elif (countryISO == "TIB"):
+        elif countryISO == "TIB":
             countryName = "Tibetan"
         else:
             print("Unknown ISO code identified:", countryISO)

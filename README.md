@@ -1,5 +1,5 @@
 ### Collector for UNHCR Population Datasets
-[![Build Status](https://github.com/OCHA-DAP/hdx-scraper-unhcr-population/workflows/build/badge.svg)](https://github.com/OCHA-DAP/hdx-scraper-unhcr-population/actions?query=workflow%3Abuild) [![Coverage Status](https://coveralls.io/repos/github/OCHA-DAP/hdx-scraper-unhcr-population/badge.svg?branch=master&ts=1)](https://coveralls.io/github/OCHA-DAP/hdx-scraper-unhcr-population?branch=master)
+[![Build Status](https://github.com/OCHA-DAP/hdx-scraper-unhcr-population/workflows/build/badge.svg)](https://github.com/OCHA-DAP/hdx-scraper-unhcr-population/actions?query=workflow%3Abuild) [![Coverage Status](https://coveralls.io/repos/github/OCHA-DAP/hdx-scraper-unhcr-population/badge.svg?branch=main&ts=1)](https://coveralls.io/github/OCHA-DAP/hdx-scraper-unhcr-population?branch=main)
 
 This script connects to the UNHCR internal API and extracts data from each dataset creating a dataset per country in HDX.  
 

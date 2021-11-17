@@ -35,7 +35,7 @@ def encoding(fields, use_original_field_names=False):
     """Convert fields structure to encoding maps for values and field names.
     Expects a fields dictionary structure, returns a tuple of two dictionaries where the keys are the field names
     (either original or new depending on the use_original_field_names parameter).
-    Resulting dictionaries map the values for each field and field names. 
+    Resulting dictionaries map the values for each field and field names.
     """
     encoding_map = {}
     encoding_field_names = {}
@@ -53,8 +53,7 @@ def encoding(fields, use_original_field_names=False):
 
 
 def hxltags_mapping(fields, use_original_field_names=False):
-    """Convert fields structure to a map from field names to hxl tags.
-    """
+    """Convert fields structure to a map from field names to hxl tags."""
     _, encoding_field_names = encoding(
         fields, use_original_field_names=use_original_field_names
     )
@@ -85,13 +84,11 @@ def add_decoded_fields_in_iterator(iterator, encoding_map, encoding_field_names)
 
 
 def convert_fields_in_iterator(iterator, fields):
-    """Rename field names and eventually add fields with decoded values as defined in the fields structure.
-    """
+    """Rename field names and eventually add fields with decoded values as defined in the fields structure."""
     encoding_map, encoding_field_names = encoding(fields)
-    for x in add_decoded_fields_in_iterator(
-            rename_fields_in_iterator(iterator, fields), encoding_map, encoding_field_names
-    ):
-        yield x
+    yield from add_decoded_fields_in_iterator(
+        rename_fields_in_iterator(iterator, fields), encoding_map, encoding_field_names
+    )
 
 
 def convert_headers(headers, fields):
@@ -107,7 +104,7 @@ def convert_headers(headers, fields):
     return new_headers
 
 
-class RowIteratorMixin(object):
+class RowIteratorMixin:
     """Mixin defining RowIterator builder interface"""
 
     def headers(self):
@@ -118,8 +115,12 @@ class RowIteratorMixin(object):
         "Dictionary mapping field names to hxl tags"
         return {}
 
-    def with_sum_field(self, field_name, hxltag="", sum_fields=[]):
+    def with_sum_field(self, field_name, hxltag="", sum_fields=None):
         """Create a new column fith *field_name* and *hxltag* that is a sum of *sum_fields*"""
+
+        if sum_fields is None:
+            sum_fields = []
+
         return RowIteratorWithSumField(self, field_name, hxltag, sum_fields)
 
     def with_fields(self, fields):
@@ -222,9 +223,9 @@ class ListIterator(RowIteratorMixin):
     def auto_headers(self, scan_all_rows=True):
         """Automatically add all fields in data.
         By default all rows are scanned *scan_all_rows* is False,
-        in which case only the first row is used. 
+        in which case only the first row is used.
         """
-        extra_headers = set([])
+        extra_headers = set()
         data = self._data if scan_all_rows else self._data[:1]
         for row in data:
             for field in row.keys():

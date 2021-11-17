@@ -2,26 +2,22 @@ import sys
 
 sys.path.append("..")
 
-import pandas as pd
 import logging
-import liquer.blueprint as bp
+import os.path
 import webbrowser
-from flask import Flask, make_response, redirect
-from liquer.cache import FileCache, set_cache, MemoryCache
-from liquer.state import set_var, get_vars
-from liquer import *
-from fields import convert_headers, convert_fields_in_iterator, hxltags_mapping
-import liquer.ext.basic
-import liquer.ext.meta
-import liquer.ext.lq_pandas
+
+import liquer.blueprint as bp
+import pandas as pd
+import plotly.express as px
 
 # import liquer.ext.lq_hxl
-import liquer.ext.lq_python
-import liquer.ext.lq_pygments
 import yaml
-import os.path
-from hdx.location.country import Country
-import plotly.express as px
+from flask import Flask, redirect
+from liquer import command, evaluate, evaluate_template, first_command
+from liquer.cache import MemoryCache, set_cache
+from liquer.state import get_vars, set_var
+
+from fields import convert_fields_in_iterator, convert_headers, hxltags_mapping
 
 # Use the extended method to cater for non-standard UNHCR ISO codes (STA, UKN etc.)
 from unhcr import Get_Country_Name_From_ISO3_Extended
@@ -97,8 +93,9 @@ def countries():
         countries.update(df.ISO3CoA)
     countries = sorted(countries)
     countrynames = [
-#        Country.get_country_name_from_iso3(countryiso) for countryiso in countries
-        Get_Country_Name_From_ISO3_Extended(countryiso) for countryiso in countries        
+        #        Country.get_country_name_from_iso3(countryiso) for countryiso in countries
+        Get_Country_Name_From_ISO3_Extended(countryiso)
+        for countryiso in countries
     ]
     return pd.DataFrame(dict(iso3=countries, country=countrynames))
 
@@ -119,7 +116,7 @@ def convert(df, add_hxltags=True):
 
 def country_columns(df):
     """Return two column names - ouuntry of origin and country of asylum.
-    Names of the columns depend on whether it is raw data or if the column names have been "converted". 
+    Names of the columns depend on whether it is raw data or if the column names have been "converted".
     """
     fields = config()["fields"]
     coo = "ISO3CoO"
@@ -169,7 +166,7 @@ def pie(df, values_column, names_column="Country"):
     assert values_column in df.columns
     assert names_column in df.columns
     if len(df) == 0:
-        return f'<div class="alert alert-warning" role="alert">No data</div>'
+        return '<div class="alert alert-warning" role="alert">No data</div>'
     return px.pie(
         df, values=values_column, names=names_column, width=600, height=400
     ).to_html(full_html=False, include_plotlyjs="cdn")
@@ -183,7 +180,7 @@ def bar(df, y_column, x_column="Year"):
     if y_column not in df.columns:
         return f'<div class="alert alert-warning" role="alert">{y_column} not in dataframe</div>'
     if len(df) == 0:
-        return f'<div class="alert alert-warning" role="alert">No data</div>'
+        return '<div class="alert alert-warning" role="alert">No data</div>'
     return px.bar(df, x=x_column, y=y_column, width=600, height=400).to_html(
         full_html=False, include_plotlyjs="cdn"
     )
@@ -197,13 +194,17 @@ def decision_bar(df, x_column="Country"):
     if x_column not in df.columns:
         return f'<div class="alert alert-warning" role="alert">{x_column} not in dataframe</div>'
     if len(y) == 0:
-        return f'<div class="alert alert-warning" role="alert">Decision category columns missing</div>'
+        return '<div class="alert alert-warning" role="alert">Decision category columns missing</div>'
     if len(df) == 0:
-        return f'<div class="alert alert-warning" role="alert">No data</div>'
+        return '<div class="alert alert-warning" role="alert">No data</div>'
 
-    return px.bar(df, x=str(x_column), y=y, width=600, height=400,).to_html(
-        full_html=False, include_plotlyjs="cdn"
-    )
+    return px.bar(
+        df,
+        x=str(x_column),
+        y=y,
+        width=600,
+        height=400,
+    ).to_html(full_html=False, include_plotlyjs="cdn")
 
 
 @command
@@ -230,21 +231,25 @@ def demographics_bar(df, x_column="Country", detailed=False):
     if x_column not in df.columns:
         return f'<div class="alert alert-warning" role="alert">{x_column} not in dataframe</div>'
     if len(y) == 0:
-        return f'<div class="alert alert-warning" role="alert">Demographics category columns missing</div>'
+        return '<div class="alert alert-warning" role="alert">Demographics category columns missing</div>'
     if len(df) == 0:
-        return f'<div class="alert alert-warning" role="alert">No data</div>'
+        return '<div class="alert alert-warning" role="alert">No data</div>'
 
     "Create a bar chart for decision categories"
-    return px.bar(df, x=str(x_column), y=y, width=600, height=400,).to_html(
-        full_html=False, include_plotlyjs="cdn"
-    )
+    return px.bar(
+        df,
+        x=str(x_column),
+        y=y,
+        width=600,
+        height=400,
+    ).to_html(full_html=False, include_plotlyjs="cdn")
 
 
 @command
 def population_bar(df, x_column="Country"):
     "Create a bar chart for population totals categories"
     if len(df) == 0:
-        return f'<div class="alert alert-warning" role="alert">No data</div>'
+        return '<div class="alert alert-warning" role="alert">No data</div>'
     return px.bar(
         df,
         x=str(x_column),
@@ -265,7 +270,7 @@ def population_bar(df, x_column="Country"):
 def solutions_bar(df, x_column="Country"):
     "Create a bar chart for solutions categories"
     if len(df) == 0:
-        return f'<div class="alert alert-warning" role="alert">No data</div>'
+        return '<div class="alert alert-warning" role="alert">No data</div>'
     return px.bar(
         df,
         x=str(x_column),
@@ -547,7 +552,7 @@ def reports():
     countries_table = evaluate(
         "countries"
     ).get()  # evaluate rather than call, so that the cache is used
-    country_map = dict(zip(countries_table.iso3, countries_table.country))
+    dict(zip(countries_table.iso3, countries_table.country))
     rows = "".join(
         f"""    <tr>
       <th>{row.country}</th>

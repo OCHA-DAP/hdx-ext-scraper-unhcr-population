@@ -1,20 +1,21 @@
 import pytest
+from ruamel.yaml import YAML
+
 from fields import (
-    rename_fields_in_iterator,
-    encoding,
-    hxltags_mapping,
+    RowIterator,
     add_decoded_fields_in_iterator,
     convert_fields_in_iterator,
     convert_headers,
-    RowIterator,
+    encoding,
+    hxltags_mapping,
+    rename_fields_in_iterator,
 )
-import yaml
 
 
 class TestFields:
     @pytest.fixture
     def fields(self):
-        return yaml.load(
+        return YAML().load(
             """
 fields:
   field1:
@@ -27,9 +28,7 @@ fields:
       tags: "#indicator+name"
       map:
         f2val1: f2val1 mapped
-        """,
-            Loader=yaml.FullLoader,
-        )["fields"]
+        """)["fields"]
 
     @pytest.fixture
     def iterator(self):
