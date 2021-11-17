@@ -1,6 +1,7 @@
 license_id: "cc-by-igo"
-notes: "Data collated by UNHCR, containing information about forcibly displaced populations and stateless persons, spanning across almost 70 years of statistical activities.  The data includes the countries / territories of asylum and origin.  Specific resources are available for end-year population totals, demographics, asylum applications, decisions, and solutions availed by refugees and IDPs (resettlement, naturalisation or returns).  " 
-caveats: "The data for the latest year (2020) is available up until the mid-year. Demographic data for the population and solutions datasets are not collected at mid-year and therefore only available up until year-end in the previous year (2019)."
+notes: "Data collated by UNHCR, containing information about forcibly displaced populations and stateless persons, spanning across more than 70 years of statistical activities.  The data includes the countries / territories of asylum and origin.  Specific resources are available for end-year population totals, demographics, asylum applications, decisions, and solutions availed by refugees and IDPs (resettlement, naturalisation or returns).  " 
+# The data for the latest year (2020) is available up until the mid-year. Demographic data for the population and solutions datasets are not collected at mid-year and therefore only available up until year-end in the previous year (2019).
+caveats: ""
 methodology: "Other"
 methodology_other: "Other"
 dataset_source: "UNHCR"

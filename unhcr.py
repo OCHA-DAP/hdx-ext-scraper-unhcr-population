@@ -32,8 +32,13 @@ WORLD = 'world'
 
 # Dec-2020 - add a switch for the latest year and if the data is ASR or MYSR
 # If MYSR, then the date in the latest year should be 30-June not 31-Dec
-LATEST_YEAR = 2020
+LATEST_YEAR = 2021
+    # 2020
 IS_ASR = False
+#IS_ASR = True
+###### Remember also to review the caveats in the hdx_dataset_static.yml #####
+
+# The data is sourced from....
 
 #-----------------------------------------------------------------------------------------------------------------------------------------------------
 def get_countriesdata(download_url, resources, downloader):
