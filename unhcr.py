@@ -34,8 +34,8 @@ WORLD = "world"
 # If MYSR, then the date in the latest year should be 30-June not 31-Dec
 LATEST_YEAR = 2021
     # 2020
-IS_ASR = False
-#IS_ASR = True
+#IS_ASR = False
+IS_ASR = True
 ###### Remember also to review the caveats in the hdx_dataset_static.yml #####
 
 # The data is sourced from....
@@ -127,6 +127,15 @@ def get_countriesdata(download_url, resources, downloader):
             headers.insert(3, country_name_column)
         for resource_name in resource_names:
             all_headers[resource_name] = headers
+
+    # June-22 - seems like we have some odd blank / null entries that need fixing here
+    # This line should remove them
+    print("Removing NULL countries")
+    print( len(countries))
+    countries = {x for x in countries if x[0] is not None}
+    print(len(countries))
+
+    # Then produce a sorted list...
     countries = [{"iso3": WORLD, "countryname": "World"}] + [
         {"iso3": x[0], "countryname": x[1]} for x in sorted(list(countries))
     ]
@@ -369,8 +378,16 @@ def Get_Country_Name_From_ISO3_Extended(countryISO):
     the given country either as the origin or as the country of asylum.
     """
 
-    countryName = Country.get_country_name_from_iso3(countryISO)
+    countryName = ""
 
+    # June-22 - This function has been updated to include a to upper without a check on if the data is null or not
+    # So we need to wrap it in a try catch
+    try:
+        countryName = Country.get_country_name_from_iso3(countryISO)
+    except:
+        print("Failed to get the country from get_country_name_from_iso3.")
+
+    # Now lets try to find it for the three typical non-standard codes
     if countryName is None or countryName == "":
 
         print("Non-standard ISO code:", countryISO)
@@ -382,6 +399,8 @@ def Get_Country_Name_From_ISO3_Extended(countryISO):
         elif countryISO == "TIB":
             countryName = "Tibetan"
         else:
-            print("Unknown ISO code identified:", countryISO)
+            print("!!SERIOUS!! Unknown ISO code identified:", countryISO)
+            # Lets add a sensible default here...
+            countryName = "Various / unknown"
 
     return countryName
