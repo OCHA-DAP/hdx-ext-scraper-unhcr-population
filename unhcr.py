@@ -116,6 +116,7 @@ def get_countriesdata(download_url, resources, downloader):
                         "REF",
                         "STA",
                         "VDA",
+                        "HST", # Added June 2022
                     ]:
                         value = row.get(field)
                         if value is None:
