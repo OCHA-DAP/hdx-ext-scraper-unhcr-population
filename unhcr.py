@@ -107,6 +107,7 @@ def get_countriesdata(download_url, resources, downloader):
                     attributes.append("outgoing")
                 if countryiso == asylum:
                     attributes.append("incoming")
+                # Added HST June 2022
                 for attribute in attributes:
                     for field in [
                         "Applications",
@@ -116,7 +117,7 @@ def get_countriesdata(download_url, resources, downloader):
                         "REF",
                         "STA",
                         "VDA",
-                        "HST", # Added June 2022
+                        "HST"
                     ]:
                         value = row.get(field)
                         if value is None:

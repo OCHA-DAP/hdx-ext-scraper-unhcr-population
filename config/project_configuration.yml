@@ -7,13 +7,13 @@ resources:
   asylum_applications:
     file: HDX_AsylumApplications.csv
     residing:
-      title: "Asylum applications by asylum-seekers residing in {countryname}"
+      title: "Asylum applications by asylum seekers residing in {countryname}"
       name: "unhcr-asylum-seekers-residing-{countryiso}"
       description: |
         Dataset collated by UNHCR, containing information about
         the number of applications for asylum residing in {countryname}. Data is available since 2000.
     originating: 
-      title: "Asylum applications by asylum-seekers originating from {countryname}"
+      title: "Asylum applications by asylum seekers originating from {countryname}"
       name: "unhcr-asylum-seekers-originating-{countryiso}"
       description: |
         Data collated by UNHCR, containing information about
@@ -22,16 +22,16 @@ resources:
   asylum_decisions:
     file: HDX_AsylumDecisions.csv
     residing:
-      title: "Asylum decisions taken on asylum claims of asylum-seekers residing in {countryname}"
+      title: "Asylum decisions taken on asylum claims of asylum seekers residing in {countryname}"
       name: "unhcr-asylum-decisions-residing-{countryiso}"
       description: |
-        Data collated by UNHCR about asylum decisions taken on asylum claims of asylum-seekers residing in {countryname}.
+        Data collated by UNHCR about asylum decisions taken on asylum claims of asylum seekers residing in {countryname}.
         Data is available since 2000.
     originating: 
-      title: "Asylum decisions taken on asylum claims of asylum-seekers originating from {countryname}"
+      title: "Asylum decisions taken on asylum claims of asylum seekers originating from {countryname}"
       name: "unhcr-asylum-decisions-originating-{countryiso}"
       description: |
-        Data collated by UNHCR about asylum decisions taken on asylum claims of asylum-seekers originating from {countryname}.
+        Data collated by UNHCR about asylum decisions taken on asylum claims of asylum seekers originating from {countryname}.
         Data is available since 2000.
   demographics:
     file: HDX_Demographics.csv
@@ -83,13 +83,13 @@ resources:
 # And then here are the list of fields
 fields:
   ASY:
-    name: Asylum-seekers
+    name: Asylum seekers
     tags: "#affected+asylum_seekers"
   ASY_incoming:
-    name: Asylum-seekers Incoming
+    name: Asylum seekers Incoming
     tags: "#affected+asylum_seekers+incoming"
   ASY_outgoing:
-    name: Asylum-seekers Outgoing
+    name: Asylum seekers Outgoing
     tags: "#affected+asylum_seekers+outgoing"
   AccommodationType:
     name: Accommodation Type
@@ -187,13 +187,13 @@ fields:
     name: Female Total
     tags: "#affected+f+total"
   IDP:
-    name: Internally Displaced Persons
+    name: Internally displaced persons
     tags: "#affected+idps"
   IDP_incoming:
-    name: Internally Displaced Persons Incoming
+    name: Internally displaced persons Incoming
     tags: "#affected+idps+incoming"
   IDP_outgoing:
-    name: Internally Displaced Persons Outgoing
+    name: Internally displaced persons Outgoing
     tags: "#affected+idps+outgoing"
   ISO3CoO:
     name: Country of Origin Code
@@ -241,13 +241,13 @@ fields:
     name: Naturalisation Outgoing
     tags: "#affected+naturalized+outgoing"
   OOC:
-    name: Others of Concern to UNHCR
+    name: Others of concern to UNHCR
     tags: "#affected+others"
   OOC_incoming:
-    name: Others of Concern to UNHCR Incoming
+    name: Others of concern to UNHCR Incoming
     tags: "#affected+others+incoming"
   OOC_outgoing:
-    name: Others of Concern to UNHCR Outgoing
+    name: Others of concern to UNHCR Outgoing
     tags: "#affected+others+outgoing"
   OtherwiseClosed:
     name: Otherwise Closed
@@ -314,14 +314,23 @@ fields:
     name: Urban or Rural
     tags: "#indicator+urban_rural+code"
   VDA:
-    name: Venezuelans Displaced Abroad
+    name: Venezuelans displaced abroad
     tags: "#affected+vda"
   VDA_incoming:
-    name: Venezuelans Displaced Abroad Incoming
+    name: Venezuelans displaced abroad Incoming
     tags: "#affected+vda+incoming"
   VDA_outgoing:
-    name: Venezuelans Displaced Abroad Outgoing
+    name: Venezuelans displaced abroad Outgoing
     tags: "#affected+vda+outgoing"
+  HST:
+    name: Host community
+    tags: "#affected+hst"
+  HST_incoming:
+    name: Host community Incoming
+    tags: "#affected+hst+incoming"
+  HST_outgoing:
+    name: Host community Outgoing
+    tags: "#affected+hst+outgoing"
   Year:
     name: Year
     tags: "#date+year"
