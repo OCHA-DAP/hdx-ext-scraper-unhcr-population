@@ -7,13 +7,12 @@ from os.path import join
 from pathlib import Path
 
 import pytest
-from hdx.data.vocabulary import Vocabulary
 from hdx.api.configuration import Configuration
 from hdx.api.locations import Locations
+from hdx.data.vocabulary import Vocabulary
 from hdx.location.country import Country
 from hdx.utilities.downloader import Download
 from hdx.utilities.path import temp_dir
-
 from unhcr import generate_dataset_and_showcase, get_countriesdata
 
 
