@@ -18,13 +18,12 @@ import logging
 from datetime import datetime
 from urllib.parse import urljoin
 
+from fields import ListIterator, RowIterator
 from hdx.data.dataset import Dataset
 from hdx.data.hdxobject import HDXError
 from hdx.data.showcase import Showcase
 from hdx.location.country import Country
 from slugify import slugify
-
-from fields import ListIterator, RowIterator
 
 logger = logging.getLogger(__name__)
 
@@ -33,8 +32,8 @@ WORLD = "world"
 # Dec-2020 - add a switch for the latest year and if the data is ASR or MYSR
 # If MYSR, then the date in the latest year should be 30-June not 31-Dec
 LATEST_YEAR = 2021
-    # 2020
-#IS_ASR = False
+# 2020
+# IS_ASR = False
 IS_ASR = True
 ###### Remember also to review the caveats in the hdx_dataset_static.yml #####
 
@@ -117,7 +116,7 @@ def get_countriesdata(download_url, resources, downloader):
                         "REF",
                         "STA",
                         "VDA",
-                        "HST"
+                        "HST",
                     ]:
                         value = row.get(field)
                         if value is None:
@@ -133,7 +132,7 @@ def get_countriesdata(download_url, resources, downloader):
     # June-22 - seems like we have some odd blank / null entries that need fixing here
     # This line should remove them
     print("Removing NULL countries")
-    print( len(countries))
+    print(len(countries))
     countries = {x for x in countries if x[0] is not None}
     print(len(countries))
 
@@ -222,6 +221,7 @@ def generate_dataset_and_showcase(
             filename,
             resourcedata,
             date_function=process_dates,
+            encoding="utf-8",
         )
 
         if success is False:
@@ -329,6 +329,7 @@ def generate_dataset_and_showcase(
             filename,
             resourcedata,
             date_function=process_dates,
+            encoding="utf-8",
         )
         if success is False:
             logger.warning(f"QuickCharts {countryname} - {filename}  has no data!")

@@ -12,12 +12,11 @@ import plotly.express as px
 
 # import liquer.ext.lq_hxl
 import yaml
+from fields import convert_fields_in_iterator, convert_headers, hxltags_mapping
 from flask import Flask, redirect
 from liquer import command, evaluate, evaluate_template, first_command
 from liquer.cache import MemoryCache, set_cache
 from liquer.state import get_vars, set_var
-
-from fields import convert_fields_in_iterator, convert_headers, hxltags_mapping
 
 # Use the extended method to cater for non-standard UNHCR ISO codes (STA, UKN etc.)
 from unhcr import Get_Country_Name_From_ISO3_Extended
