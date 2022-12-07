@@ -313,15 +313,15 @@ fields:
   UrbanRural:
     name: Urban or Rural
     tags: "#indicator+urban_rural+code"
-  VDA:
-    name: Venezuelans displaced abroad
-    tags: "#affected+vda"
-  VDA_incoming:
-    name: Venezuelans displaced abroad Incoming
-    tags: "#affected+vda+incoming"
-  VDA_outgoing:
-    name: Venezuelans displaced abroad Outgoing
-    tags: "#affected+vda+outgoing"
+  OIP:
+    name: Other people in need of international protection
+    tags: "#affected+oip"
+  OIP_incoming:
+    name: Other people in need of international protection Incoming
+    tags: "#affected+oip+incoming"
+  OIP_outgoing:
+    name: Other people in need of international protection Outgoing
+    tags: "#affected+oip+outgoing"
   HST:
     name: Host community
     tags: "#affected+hst"

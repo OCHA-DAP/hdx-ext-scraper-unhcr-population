@@ -269,9 +269,9 @@ fields:
   UrbanRural:
     name: Urban or Rural
     tags: '#indicator+urban_rural+code'
-  VDA:
-    name: Venezuelans Displaced Abroad
-    tags: '#affected+vda'
+  OIP:
+    name: Other people in need of international protection
+    tags: '#affected+oip'
   Year:
     name: Year
     tags: '#date+year'

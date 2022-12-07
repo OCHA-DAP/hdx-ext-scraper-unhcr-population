@@ -254,11 +254,11 @@ def population_bar(df, x_column="Country"):
         x=str(x_column),
         y=[
             "Refugees",
-            "Internally Displaced Persons",
             "Asylum-seekers",
+            "Other people in need of international protection",
+            "Internally Displaced Persons",
             "Others of Concern to UNHCR",
             "Stateless persons",
-            "Venezuelans Displaced Abroad",
         ],
         width=600,
         height=400,

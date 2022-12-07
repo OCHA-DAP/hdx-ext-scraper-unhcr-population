@@ -110,12 +110,12 @@ def get_countriesdata(download_url, resources, downloader):
                 for attribute in attributes:
                     for field in [
                         "Applications",
-                        "ASY",
-                        "IDP",
-                        "OOC",
                         "REF",
+                        "ASY",
+                        "OIP",
+                        "IDP",
                         "STA",
-                        "VDA",
+                        "OOC",
                         "HST",
                     ]:
                         value = row.get(field)
@@ -275,7 +275,7 @@ def generate_dataset_and_showcase(
                 [
                     x
                     for x in headers
-                    if x.startswith(("REF", "ASY", "VDA")) and x.endswith("_outgoing")
+                    if x.startswith(("REF", "ASY", "OIP")) and x.endswith("_outgoing")
                 ],
             )
             .with_sum_field(
@@ -284,7 +284,7 @@ def generate_dataset_and_showcase(
                 [
                     x
                     for x in headers
-                    if x.startswith(("REF", "ASY", "IDP", "VDA", "STA"))
+                    if x.startswith(("REF", "ASY", "IDP", "OIP", "STA"))
                     and x.endswith("_incoming")
                 ],
             )
@@ -294,7 +294,7 @@ def generate_dataset_and_showcase(
                 [
                     x
                     for x in headers
-                    if x.startswith(("REF", "ASY", "IDP", "VDA", "STA"))
+                    if x.startswith(("REF", "ASY", "IDP", "OIP", "STA"))
                     and x.endswith("_outgoing")
                 ],
             )

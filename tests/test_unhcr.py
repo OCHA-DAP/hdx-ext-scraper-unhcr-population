@@ -94,8 +94,8 @@ class TestUNHCR:
             "REF_outgoing": "1419084",
             "STA_incoming": "0",
             "STA_outgoing": "0",
-            "VDA_incoming": "0",
-            "VDA_outgoing": "0",
+            "OIP_incoming": "0",
+            "OIP_outgoing": "0",
         }
 
     def test_generate_dataset_and_showcase(self, configuration, data):
