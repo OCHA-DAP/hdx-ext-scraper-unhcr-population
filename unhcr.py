@@ -15,7 +15,7 @@ Anguilla: https://feature.data-humdata-org.ahconu.org/dataset/unhcr-population-d
 
 """
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from urllib.parse import urljoin
 
 from fields import ListIterator, RowIterator
@@ -180,13 +180,13 @@ def generate_dataset_and_showcase(
 
     def process_dates(row):
         year = int(row["Year"])
-        startdate = datetime(year, 1, 1)
+        startdate = datetime(year, 1, 1, tzinfo=timezone.utc)
         # For mid-year data it should be 30-June...
-        # enddate = datetime(year, 12, 31)
+        # enddate = datetime(year, 12, 31, tzinfo=timezone.utc)
         if IS_ASR is False and year == LATEST_YEAR:
-            enddate = datetime(year, 6, 30)
+            enddate = datetime(year, 6, 30, tzinfo=timezone.utc)
         else:
-            enddate = datetime(year, 12, 31)
+            enddate = datetime(year, 12, 31, tzinfo=timezone.utc)
         return {"startdate": startdate, "enddate": enddate}
 
     earliest_startdate = None
@@ -237,7 +237,7 @@ def generate_dataset_and_showcase(
     if len(dataset.get_resources()) == 0:
         logger.error(f"{countryname}  has no data!")
         return None, None, None
-    dataset.set_date_of_dataset(earliest_startdate, latest_enddate)
+    dataset.set_reference_period(earliest_startdate, latest_enddate)
     bites_disabled = [True, True, True]
     if countryiso != WORLD:
         filename = "qc_data.csv"
