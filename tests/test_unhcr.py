@@ -31,7 +31,9 @@ class TestUNHCR:
             "tags": [
                 {"name": "hxl"},
                 {"name": "refugees"},
-                {"name": "asylum"},
+                {"name": "asylum seekers"},
+                {"name": "internally displaced persons-idp"},
+                {"name": "stateless persons"},
                 {"name": "population"},
             ],
             "id": "4e61d464-4943-4e97-973a-84673c1aaa87",

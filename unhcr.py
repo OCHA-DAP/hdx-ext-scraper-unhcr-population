@@ -172,7 +172,14 @@ def generate_dataset_and_showcase(
             logger.error(f"{countryname} ({countryiso})  not recognised!")
             return None, None, None
 
-    tags = ["hxl", "refugees", "asylum", "population"]
+    tags = [
+        "hxl",
+        "refugees",
+        "asylum seekers",
+        "internally displaced persons-idp",
+        "stateless persons",
+        "population",
+    ]
     dataset.add_tags(tags)
 
     # Filter the quick chart data to only include the relevant data for the current country
