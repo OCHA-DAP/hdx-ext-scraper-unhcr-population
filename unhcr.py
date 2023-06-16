@@ -31,7 +31,7 @@ WORLD = "world"
 
 # Dec-2020 - add a switch for the latest year and if the data is ASR or MYSR
 # If MYSR, then the date in the latest year should be 30-June not 31-Dec
-LATEST_YEAR = 2021
+LATEST_YEAR = 2022
 # 2020
 # IS_ASR = False
 IS_ASR = True

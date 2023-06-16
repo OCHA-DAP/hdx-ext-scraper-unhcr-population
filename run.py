@@ -71,7 +71,10 @@ def main():
                 dataset["notes"] = dataset["notes"].replace(
                     "\n", "  \n"
                 )  # ensure markdown has line breaks
-                resourceview = dataset.generate_resource_view(
+                # June-23 - change to underscore method name (and actually the correct one is
+                #resourceview = dataset.generate_resource_view(
+                #resourceview = dataset._generate_resource_view(
+                resourceview = dataset.generate_quickcharts(
                     -1, bites_disabled=bites_disabled
                 )
                 if resourceview:
