@@ -71,7 +71,7 @@ def main():
                 dataset["notes"] = dataset["notes"].replace(
                     "\n", "  \n"
                 )  # ensure markdown has line breaks
-                # June-23 - change to underscore method name (and actually the correct one is
+                # June-23 - change to underscore method name (and actually the correct one is generate quick charts)
                 #resourceview = dataset.generate_resource_view(
                 #resourceview = dataset._generate_resource_view(
                 resourceview = dataset.generate_quickcharts(
