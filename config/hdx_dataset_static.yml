@@ -3,7 +3,7 @@ notes: "Data collated by UNHCR, containing information about forcibly displaced 
 # The data for the latest year (2020) is available up until the mid-year. Demographic data for the population and solutions datasets are not collected at mid-year and therefore only available up until year-end in the previous year (2019).
 caveats: ""
 methodology: "Other"
-methodology_other: "Other"
+methodology_other: "The biannual collection, compilation, quality assurance and dissemination of statistics on refugees, asylum-seekers, internally displaced persons (IDPs) and stateless people is challenging.  Statistics are collated primarily from governments hosting these populations, UNHCR's own registration data and more rarely data published by non-governmental organizations."
 dataset_source: "UNHCR"
 private: False  # has to be True or False
 url: ~
