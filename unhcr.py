@@ -31,10 +31,14 @@ WORLD = "world"
 
 # Dec-2020 - add a switch for the latest year and if the data is ASR or MYSR
 # If MYSR, then the date in the latest year should be 30-June not 31-Dec
-LATEST_YEAR = 2022
-# 2020
-# IS_ASR = False
-IS_ASR = True
+LATEST_YEAR = 2023
+    # 2022
+    # 2020
+IS_ASR = False
+
+# NOTE - change also the three references to mid/end year in hdx_resource_view_static
+
+# IS_ASR = True
 ###### Remember also to review the caveats in the hdx_dataset_static.yml #####
 
 # The data is sourced from....
