@@ -119,9 +119,11 @@ fields:
         NA: New and appeal
         NR: New and repeat
         FA: First and appeal
+        RA: Repeat/reopened
         J:  Judiciary
         BL: Backlog 
         SP: Subsidiary protection
+        V: Various
   Applications:
     name: Number of Applications
     tags: "#inneed+asylum_seekers+applications"
@@ -151,7 +153,7 @@ fields:
          NA: New Applications
          FI: First instance decisions
          AR: Administrative Review decisions
-         RA: Repeat/reopened applications
+         RA: Repeat/reopened
          IN: US Citizenship and Immigration Services
          EO: US Executive Office of Immigration Review
          JR: Judicial Review
