@@ -41,14 +41,14 @@ resources:
       description: |
         Data collated by UNHCR, containing information about forcibly displaced populations
         and stateless persons residing in {countryname}. It includes data on their demographics as well as sub-national locations.
-        Data is available from 2001.
+        The demographic data is only collected annually and data is available from 2001.
     originating: 
       title: "Demographics and locations of forcibly displaced persons originating from {countryname}"
       name: "unhcr-demographics-originating-{countryiso}"
       description: |
         Data collated by UNHCR, containing information about forcibly displaced populations
         originating from {countryname}. It includes data on their demographics as well as sub-national locations.
-        Data is available from 2001.
+        The demographic data is only collected annually and data is available from 2001.
   end_year_population_totals:
     file: HDX_EndYearPopulationTotals.csv
     residing:
