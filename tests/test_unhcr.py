@@ -26,7 +26,7 @@ class TestUNHCR:
         )
         Locations.set_validlocations([{"name": "bgd", "title": "Bangladesh"}])
         Country.countriesdata(use_live=False)
-        Vocabulary._tags_dict = True
+        Vocabulary._tags_dict = {}
         Vocabulary._approved_vocabulary = {
             "tags": [
                 {"name": "hxl"},
