@@ -5,15 +5,16 @@ UNHCR:
 
 Generates HXlated API urls from the UNHCR data.
 
-See: https://github.com/OCHA-DAP/hdx-scraper-unhcr-population 
+See: https://github.com/OCHA-DAP/hdx-scraper-unhcr-population
 (formerly): https://github.com/orest-d/hdx-scraper-unhcr-population/tree/master
-Output examples: 
+Output examples:
 Aruba: https://feature.data-humdata-org.ahconu.org/dataset/unhcr-population-data-for-abw
 Afghanistan: https://feature.data-humdata-org.ahconu.org/dataset/unhcr-population-data-for-afg
 Andorra: https://feature.data-humdata-org.ahconu.org/dataset/unhcr-population-data-for-and
 Anguilla: https://feature.data-humdata-org.ahconu.org/dataset/unhcr-population-data-for-aia
 
 """
+
 import logging
 from datetime import datetime, timezone
 from urllib.parse import urljoin
@@ -32,11 +33,11 @@ WORLD = "world"
 # Dec-2020 - add a switch for the latest year and if the data is ASR or MYSR
 # If MYSR, then the date in the latest year should be 30-June not 31-Dec
 LATEST_YEAR = 2024
-    # 2023
-    # 2022
-    # 2020
+# 2023
+# 2022
+# 2020
 IS_ASR = False
-    #True
+# True
 
 # NOTE - change also the three references to mid/end year in hdx_resource_view_static
 
@@ -44,6 +45,7 @@ IS_ASR = False
 ###### Remember also to review the caveats in the hdx_dataset_static.yml #####
 
 # The data is sourced from....
+
 
 # -----------------------------------------------------------------------------------------------------------------------------------------------------
 def get_countriesdata(download_url, resources, downloader):
@@ -226,7 +228,7 @@ def generate_dataset_and_showcase(
             "residing in World", "(Global)"
         )
         rowit = RowIterator(headers[resource_name], resource_rows).with_fields(fields)
-        success, results = dataset.generate_resource_from_iterator(
+        success, results = dataset.generate_resource_from_iterable(
             rowit.headers(),
             rowit,
             rowit.hxltags_mapping(),
@@ -250,7 +252,7 @@ def generate_dataset_and_showcase(
     if len(dataset.get_resources()) == 0:
         logger.error(f"{countryname}  has no data!")
         return None, None, None
-    dataset.set_reference_period(earliest_startdate, latest_enddate)
+    dataset.set_time_period(earliest_startdate, latest_enddate)
     bites_disabled = [True, True, True]
     if countryiso != WORLD:
         filename = "qc_data.csv"
@@ -334,7 +336,7 @@ def generate_dataset_and_showcase(
                 bites_disabled[2] = False
 
         rowit.reset()
-        success, results = dataset.generate_resource_from_iterator(
+        success, results = dataset.generate_resource_from_iterable(
             rowit.headers(),
             rowit,
             rowit.hxltags_mapping(),
@@ -405,7 +407,6 @@ def Get_Country_Name_From_ISO3_Extended(countryISO):
 
     # Now lets try to find it for the three typical non-standard codes
     if countryName is None or countryName == "":
-
         print("Non-standard ISO code:", countryISO)
 
         if countryISO == "UKN":

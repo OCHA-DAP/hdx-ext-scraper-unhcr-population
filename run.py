@@ -3,6 +3,7 @@
 Top level script. Calls other functions that generate datasets that this script then creates in HDX.
 
 """
+
 import logging
 
 # To switch on the structure of the file paths depending on the operating system
@@ -72,8 +73,8 @@ def main():
                     "\n", "  \n"
                 )  # ensure markdown has line breaks
                 # June-23 - change to underscore method name (and actually the correct one is generate quick charts)
-                #resourceview = dataset.generate_resource_view(
-                #resourceview = dataset._generate_resource_view(
+                # resourceview = dataset.generate_resource_view(
+                # resourceview = dataset._generate_resource_view(
                 resourceview = dataset.generate_quickcharts(
                     -1, bites_disabled=bites_disabled
                 )

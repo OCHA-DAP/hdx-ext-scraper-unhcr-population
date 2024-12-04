@@ -67,7 +67,7 @@ def hxltags_mapping(fields, use_original_field_names=False):
 
         if "encoding" in f:
             if f["encoding"].get("expand", True):
-                hxltags[encoding_field_names[key]] = f["encoding"].get("tags", f"")
+                hxltags[encoding_field_names[key]] = f["encoding"].get("tags", "")
     return hxltags
 
 
