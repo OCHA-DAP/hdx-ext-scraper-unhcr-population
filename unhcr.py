@@ -252,7 +252,6 @@ def generate_dataset_and_showcase(
     if len(dataset.get_resources()) == 0:
         logger.error(f"{countryname}  has no data!")
         return None, None, None
-    dataset.set_time_period(earliest_startdate, latest_enddate)
     bites_disabled = [True, True, True]
     if countryiso != WORLD:
         filename = "qc_data.csv"
@@ -348,6 +347,7 @@ def generate_dataset_and_showcase(
         )
         if success is False:
             logger.warning(f"QuickCharts {countryname} - {filename}  has no data!")
+    dataset.set_time_period(earliest_startdate, latest_enddate)
     showcase = Showcase(
         {
             "name": f"{slugified_name}-showcase",
