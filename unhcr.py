@@ -168,7 +168,7 @@ def generate_dataset_and_showcase(
     dataset = Dataset({"name": slugified_name, "title": title})
     dataset.set_maintainer("8d70b12b-7247-48d2-b426-dbb4bf82eb7c")
     dataset.set_organization("abf4ca86-8e69-40b1-92f7-71509992be88")
-    dataset.set_expected_update_frequency("Every six months")
+    dataset.set_expected_update_frequency("Every year")
     dataset.set_subnational(True)
     if countryiso == WORLD:
         dataset.add_other_location("world")
