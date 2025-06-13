@@ -4,6 +4,20 @@
 
 # Here is the list of resources, which includes the filename, and all the relevant metadata
 resources:
+  end_year_population_totals:
+    file: HDX_EndYearPopulationTotals.csv
+    residing:
+      title: "End-year stock population figures for forcibly displaced and stateless persons residing in {countryname}"
+      name: "unhcr-population-forcibly-displaced-residing-{countryiso}"
+      description: |
+        Data collated by UNHCR, containing end-year stock population figures for forcibly displaced and stateless persons residing in {countryname}.
+        Data is available since 1951.
+    originating:
+      title: "End-year stock population figures for forcibly displaced persons originating from {countryname}"
+      name: "unhcr-population-forcibly-displaced-originating-{countryiso}"
+      description: |
+        Data collated by UNHCR, containing end-year stock population figures for forcibly displaced persons originating from {countryname}.
+        Data is available since 1951.
   asylum_applications:
     file: HDX_AsylumApplications.csv
     residing:
@@ -36,33 +50,19 @@ resources:
   demographics:
     file: HDX_Demographics.csv
     residing:
-      title: "Demographics and locations of forcibly displaced and stateless persons residing in {countryname}"
+      title: "Demographics and locations of forcibly displaced and stateless people residing in {countryname}"
       name: "unhcr-demographics-residing-{countryiso}"
       description: |
         Data collated by UNHCR, containing information about forcibly displaced populations
-        and stateless persons residing in {countryname}. It includes data on their demographics as well as sub-national locations.
+        and stateless people residing in {countryname}. It includes data on their demographics as well as sub-national locations.
         The demographic data is only collected annually and data is available from 2001.
     originating: 
-      title: "Demographics and locations of forcibly displaced persons originating from {countryname}"
+      title: "Demographics and locations of forcibly displaced people originating from {countryname}"
       name: "unhcr-demographics-originating-{countryiso}"
       description: |
         Data collated by UNHCR, containing information about forcibly displaced populations
         originating from {countryname}. It includes data on their demographics as well as sub-national locations.
         The demographic data is only collected annually and data is available from 2001.
-  end_year_population_totals:
-    file: HDX_EndYearPopulationTotals.csv
-    residing:
-      title: "End-year stock population figures for forcibly displaced and stateless persons residing in {countryname}"
-      name: "unhcr-population-forcibly-displaced-residing-{countryiso}"
-      description: |
-        Data collated by UNHCR, containing end-year stock population figures for forcibly displaced and stateless persons residing in {countryname}.
-        Data is available since 1951.
-    originating: 
-      title: "End-year stock population figures for forcibly displaced persons originating from {countryname}"
-      name: "unhcr-population-forcibly-displaced-originating-{countryiso}"
-      description: |
-        Data collated by UNHCR, containing end-year stock population figures for forcibly displaced persons originating from {countryname}.
-        Data is available since 1951.
   solutions:
     file: HDX_Solutions.csv
     residing:

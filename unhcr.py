@@ -36,10 +36,16 @@ LATEST_YEAR = 2024
 # 2023
 # 2022
 # 2020
-IS_ASR = False
-# True
+IS_ASR = True
+    #False
+
 
 # NOTE - change also the three references to mid/end year in hdx_resource_view_static
+# End-year data (mid-year for the latest year)
+# Latest mid-year data
+
+# Check also we have the latest version of HDX (see the link above)
+# and https://pypi.org/project/python-slugify/
 
 # IS_ASR = True
 ###### Remember also to review the caveats in the hdx_dataset_static.yml #####
