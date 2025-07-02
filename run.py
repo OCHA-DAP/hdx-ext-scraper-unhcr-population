@@ -25,6 +25,15 @@ logger = logging.getLogger(__name__)
 
 lookup = "hdx-scraper-unhcr-population"
 
+desired_order = (
+    "End-year stock",
+    "Demographics",
+    "Asylum applications",
+    "Asylum decisions",
+    "Solutions",
+)
+direction_order = ("originating", "residing", "(Global)")
+
 
 def main():
     """Generate dataset and create it in HDX"""
@@ -92,6 +101,28 @@ def main():
                     updated_by_script="UNHCR population",
                     batch=info["batch"],
                 )
+
+                resource_ids = []
+                resources = dataset.get_resources()
+                for name_start in desired_order:
+                    for direction in direction_order:
+                        for resource in resources:
+                            name = resource["name"]
+                            if name.startswith(name_start) and direction in name:
+                                resource_ids.append(resource["id"])
+                                break
+                for resource in resources:
+                    resource_id = resource["id"]
+                    name = resource["name"]
+                    if name == "qc_data.csv":
+                        resource_ids.append(resource_id)
+                        continue
+                    if resource_id not in resource_ids:
+                        name = resource["name"]
+                        logger.error(f"{name} is missing!")
+                        sys.exit(-1)
+                dataset.reorder_resources(resource_ids, False)
+
                 showcase.create_in_hdx()
                 showcase.add_dataset(dataset)
 
