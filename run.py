@@ -13,6 +13,7 @@ import sys
 from os import getenv
 from os.path import join
 from pathlib import Path
+from time import sleep
 
 from hdx.api.configuration import Configuration
 from hdx.facades.simple import facade
@@ -38,8 +39,14 @@ direction_order = ("originating", "residing", "(Global)")
 def main():
     """Generate dataset and create it in HDX"""
     configuration = Configuration.read()
-    resources = configuration["resources"]
+    # October-2025 - the code below cleverly uses the same variable name ("resources"), but for a dataset specific list rather than this global dictionary.
+    # It's perhaps clearer to simply rename this one, which is only referenced a couple of times
+    global_resources = configuration["resources"]
     fields = configuration["fields"]
+
+    print(global_resources)
+    sleep(5)
+
 
     # print out the WHERE TO START Parameter
     print("Starting at country (WHERETOSTART): ", getenv("WHERETOSTART"))
@@ -58,7 +65,7 @@ def main():
 
     with Download() as downloader:
         countries, headers, countriesdata, qc_rows = get_countriesdata(
-            download_url, resources, downloader
+            download_url, global_resources, downloader
         )
         logger.info(f"Number of countries: {len(countriesdata)}")
         for info, country in progress_storing_tempdir(
@@ -73,7 +80,7 @@ def main():
                 countriesdata[countryiso],
                 qc_rows,
                 headers,
-                resources,
+                global_resources,
                 fields,
             )
             if dataset:

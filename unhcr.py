@@ -217,6 +217,9 @@ def generate_dataset_and_showcase(
     for resource_name, resource_rows in countrydata.items():
         resource_id = "_".join(resource_name.split("_")[:-1])
         originating_residing = resource_name.split("_")[-1]  # originating or residing
+
+        #print("Looping through the resources - this is the current one: ", resource_id)
+        #print(resources[resource_id])
         record = resources[resource_id]
 
         if (
