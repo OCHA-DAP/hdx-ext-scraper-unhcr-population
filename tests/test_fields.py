@@ -5,7 +5,6 @@ from fields import (
     convert_fields_in_iterator,
     convert_headers,
     encoding,
-    hxltags_mapping,
     rename_fields_in_iterator,
 )
 from ruamel.yaml import YAML
@@ -21,10 +20,8 @@ fields:
     name: field1 renamed
   field2:
     name: field2 renamed
-    tags: "#indicator+code"
     encoding:
       name: field2e
-      tags: "#indicator+name"
       map:
         f2val1: f2val1 mapped
         """
@@ -54,22 +51,6 @@ fields:
         )
         assert encoding_map == {"field2": {"f2val1": "f2val1 mapped"}}
         assert encoding_field_names == {"field2": "field2e"}
-
-    def test_hxltags_mapping1(self, fields):
-        hxltags = hxltags_mapping(fields)
-        assert hxltags == {
-            "field1 renamed": "",
-            "field2 renamed": "#indicator+code",
-            "field2e": "#indicator+name",
-        }
-
-    def test_hxltags_mapping2(self, fields):
-        hxltags = hxltags_mapping(fields, use_original_field_names=True)
-        assert hxltags == {
-            "field1": "",
-            "field2": "#indicator+code",
-            "field2e": "#indicator+name",
-        }
 
     def test_add_decoded_fields_in_iterator(self, iterator, fields):
         encoding_map, encoding_field_names = encoding(
@@ -131,11 +112,6 @@ fields:
             "field2e",
             "unspecified_field",
         ]
-        assert rowit.hxltags_mapping() == {
-            "field1 renamed": "",
-            "field2 renamed": "#indicator+code",
-            "field2e": "#indicator+name",
-        }
         result = list(rowit)
         assert len(result) == 2
         assert result == [

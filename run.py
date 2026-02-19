@@ -64,7 +64,7 @@ def main():
         download_url = Path("data").resolve().as_uri()
 
     with Download() as downloader:
-        countries, headers, countriesdata, qc_rows = get_countriesdata(
+        countries, headers, countriesdata = get_countriesdata(
             download_url, global_resources, downloader
         )
         logger.info(f"Number of countries: {len(countriesdata)}")
@@ -74,11 +74,10 @@ def main():
             folder = info["folder"]
 
             countryiso = country["iso3"]
-            dataset, showcase, bites_disabled = generate_dataset_and_showcase(
+            dataset, showcase = generate_dataset_and_showcase(
                 folder,
                 country,
                 countriesdata[countryiso],
-                qc_rows,
                 headers,
                 global_resources,
                 fields,
@@ -88,23 +87,8 @@ def main():
                 dataset["notes"] = dataset["notes"].replace(
                     "\n", "  \n"
                 )  # ensure markdown has line breaks
-                # June-23 - change to underscore method name (and actually the correct one is generate quick charts)
-                # resourceview = dataset.generate_resource_view(
-                # resourceview = dataset._generate_resource_view(
-                resourceview = dataset.generate_quickcharts(
-                    -1, bites_disabled=bites_disabled
-                )
-                if resourceview:
-                    resourceview["hxl_preview_config"] = multiple_replace(
-                        resourceview["hxl_preview_config"],
-                        {
-                            "{{#country+iso}}": countryiso,
-                            "{{#country+name}}": country["countryname"],
-                        },
-                    )
                 dataset.create_in_hdx(
                     remove_additional_resources=True,
-                    hxl_update=False,
                     updated_by_script="UNHCR population",
                     batch=info["batch"],
                 )
@@ -120,10 +104,6 @@ def main():
                                 break
                 for resource in resources:
                     resource_id = resource["id"]
-                    name = resource["name"]
-                    if name == "qc_data.csv":
-                        resource_ids.append(resource_id)
-                        continue
                     if resource_id not in resource_ids:
                         name = resource["name"]
                         logger.error(f"{name} is missing!")

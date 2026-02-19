@@ -12,7 +12,7 @@ import plotly.express as px
 
 # import liquer.ext.lq_hxl
 import yaml
-from fields import convert_fields_in_iterator, convert_headers, hxltags_mapping
+from fields import convert_fields_in_iterator, convert_headers
 from flask import Flask, redirect
 from liquer import command, evaluate, evaluate_template, first_command
 from liquer.cache import MemoryCache, set_cache
@@ -42,7 +42,7 @@ def data_path():
 
 @first_command
 def config():
-    "Config data structure containing the field name conversions and hxl tags"
+    "Config data structure containing the field name conversions"
     return yaml.load(open("../config/project_configuration.yml"))
 
 
@@ -100,16 +100,11 @@ def countries():
 
 
 @command
-def convert(df, add_hxltags=True):
-    "Rename fields and optionally add hxl tags"
+def convert(df):
+    "Rename fields"
     fields = config()["fields"]
     columns = convert_headers(df.columns, fields)
-    mapping = hxltags_mapping(fields)
-    if add_hxltags:
-        hxltags = [{c: mapping.get(c, "") for c in columns}]
-    else:
-        hxltags = []
-    data = hxltags + list(convert_fields_in_iterator(df.to_dict("records"), fields))
+    data = list(convert_fields_in_iterator(df.to_dict("records"), fields))
     return pd.DataFrame(data, columns=columns)
 
 
