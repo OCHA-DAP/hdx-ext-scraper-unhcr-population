@@ -225,7 +225,7 @@ def generate_dataset_and_showcase(
 
     if len(dataset.get_resources()) == 0:
         logger.error(f"{countryname}  has no data!")
-        return None, None, None
+        return None, None
     dataset.set_time_period(earliest_startdate, latest_enddate)
     showcase = Showcase(
         {
