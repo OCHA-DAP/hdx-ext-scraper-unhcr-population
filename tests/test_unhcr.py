@@ -30,7 +30,6 @@ class TestUNHCR:
         Vocabulary._tags_dict = {}
         Vocabulary._approved_vocabulary = {
             "tags": [
-                {"name": "hxl"},
                 {"name": "refugees"},
                 {"name": "asylum seekers"},
                 {"name": "internally displaced persons-idp"},
@@ -51,7 +50,7 @@ class TestUNHCR:
         return get_countriesdata(download_url, resources, Download(user_agent="test"))
 
     def test_get_countriesdata(self, data):
-        countries, headers, countriesdata, qc_rows = data
+        countries, headers, countriesdata = data
         assert len(headers) == 10
         assert headers["asylum_applications_residing"] == [
             "Year",
@@ -78,40 +77,17 @@ class TestUNHCR:
             "ApplicationAveragePersonsPerCase": "3.3",
             "Applications": "5",
         }
-        assert len(qc_rows) == 1067
-        assert qc_rows["2019_AFG_PAK"] == {
-            "Year": "2019",
-            "ISO3CoO": "AFG",
-            "ISO3CoA": "PAK",
-            "CoO_name": "Afghanistan",
-            "CoA_name": "Pakistan",
-            "Applications_incoming": "3545",
-            "Applications_outgoing": "3545",
-            "ASY_incoming": "8406",
-            "ASY_outgoing": "8406",
-            "IDP_incoming": "0",
-            "IDP_outgoing": "0",
-            "OOC_incoming": "0",
-            "OOC_outgoing": "0",
-            "REF_incoming": "1419084",
-            "REF_outgoing": "1419084",
-            "STA_incoming": "0",
-            "STA_outgoing": "0",
-            "OIP_incoming": "0",
-            "OIP_outgoing": "0",
-        }
 
     def test_generate_dataset_and_showcase(self, configuration, data):
         with temp_dir("ucdp") as folder:
             resources = configuration["resources"]
             fields = configuration["fields"]
-            countries, headers, countriesdata, qc_rows = data
+            countries, headers, countriesdata = data
             index = [i for i, c in enumerate(countries) if c["iso3"] == "BGD"][0]
-            dataset, showcase, bites_disabled = generate_dataset_and_showcase(
+            dataset, showcase = generate_dataset_and_showcase(
                 folder,
                 countries[index],
                 countriesdata["BGD"],
-                qc_rows,
                 headers,
                 resources,
                 fields,
@@ -123,8 +99,6 @@ class TestUNHCR:
             )
 
             resources = dataset.get_resources()
-            assert len(resources) == 5  # should be 10 if all data is available
+            assert len(resources) == 4  # should be 8? if all data is available
 
             assert showcase["name"] == "unhcr-population-data-for-bgd-showcase"
-
-            assert bites_disabled == [False, True, True]

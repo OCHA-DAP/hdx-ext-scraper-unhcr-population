@@ -1,20 +1,17 @@
 """
-Utilities for using a "fields" structure to define hxl tags, rename fields and decode fields values.
+Utilities for using a "fields" structure to rename fields and decode fields values.
 The fields structure looks is a dictionary that looks like this:
   field1:
     name: 'New name for field1'
-    tags: '#meta+tags+for+field1'
   field2:
     name: "New name for field2"
-    tags: '#indicator+code'
     encoding:
       name: "Field2 names"    # Name of the new field created out of field2 by applying the map
-      tags: '#indicator+name' # HXL tags for the new field
       map:
         f2val1: "field2 value 1 mapped"
         f2val2: "field2 value 2 mapped"
 
-Use convert_fields_in_iterator to convert an iterator, hxltags_mapping to extract mapping of field names (new or old)
+Use convert_fields_in_iterator to convert an iterator to extract mapping of field names (new or old)
 and finally convert_headers to convert the headers.
 """
 
@@ -50,25 +47,6 @@ def encoding(fields, use_original_field_names=False):
                 encoding_field_names[key] = f["encoding"].get("name", f"{key}_")
                 encoding_map[key] = f["encoding"].get("map", {})
     return encoding_map, encoding_field_names
-
-
-def hxltags_mapping(fields, use_original_field_names=False):
-    """Convert fields structure to a map from field names to hxl tags."""
-    _, encoding_field_names = encoding(
-        fields, use_original_field_names=use_original_field_names
-    )
-    hxltags = {}
-    for original_field_name, f in fields.items():
-        if use_original_field_names:
-            key = original_field_name
-        else:
-            key = f.get("name", original_field_name)
-        hxltags[key] = f.get("tags", "")
-
-        if "encoding" in f:
-            if f["encoding"].get("expand", True):
-                hxltags[encoding_field_names[key]] = f["encoding"].get("tags", "")
-    return hxltags
 
 
 def add_decoded_fields_in_iterator(iterator, encoding_map, encoding_field_names):
@@ -111,17 +89,13 @@ class RowIteratorMixin:
         "List of field names of the row iterator"
         return self._headers
 
-    def hxltags_mapping(self):
-        "Dictionary mapping field names to hxl tags"
-        return {}
-
-    def with_sum_field(self, field_name, hxltag="", sum_fields=None):
-        """Create a new column fith *field_name* and *hxltag* that is a sum of *sum_fields*"""
+    def with_sum_field(self, field_name, sum_fields=None):
+        """Create a new column with *field_name* that is a sum of *sum_fields*"""
 
         if sum_fields is None:
             sum_fields = []
 
-        return RowIteratorWithSumField(self, field_name, hxltag, sum_fields)
+        return RowIteratorWithSumField(self, field_name, sum_fields)
 
     def with_fields(self, fields):
         """Use fields structure to perform the conversion."""
@@ -129,21 +103,18 @@ class RowIteratorMixin:
 
     def sort_by(self, field, descending=False):
         headers = self.headers()
-        mapping = self.hxltags_mapping()
         data = sorted(self, key=lambda x, f=field: x.get(f), reverse=descending)
-        return ListIterator(data, headers=headers, hxltags_mapping=mapping)
+        return ListIterator(data, headers=headers)
 
     def to_list_iterator(self):
         headers = self.headers()
-        mapping = self.hxltags_mapping()
         data = list(self)
-        return ListIterator(data, headers=headers, hxltags_mapping=mapping)
+        return ListIterator(data, headers=headers)
 
     def select(self, condition):
         headers = self.headers()
-        mapping = self.hxltags_mapping()
         data = [row for row in self if condition(row)]
-        return ListIterator(data, headers=headers, hxltags_mapping=mapping)
+        return ListIterator(data, headers=headers)
 
     def to_csv(self, f, sep=","):
         """Write row iterator to a file *f*, which can be a file object or a string with path."""
@@ -161,8 +132,6 @@ class RowIteratorMixin:
             f = open(f, "w")
         headers = self.headers()
         f.write(sep.join(headers) + "\n")
-        mapping = self.hxltags_mapping()
-        f.write(sep.join(mapping.get(x, "") for x in headers) + "\n")
         for row in self:
             f.write(sep.join(cell(row.get(x, "")) for x in headers) + "\n")
         f.close()
@@ -180,10 +149,6 @@ class RowIteratorProxyMixin(RowIteratorMixin):
     def headers(self):
         "List of field names of the row iterator"
         return self.rowit.headers()
-
-    def hxltags_mapping(self):
-        "Dictionary mapping field names to hxl tags"
-        return self.rowit.hxltags_mapping()
 
     def reset(self):
         self.rowit.reset()
@@ -203,15 +168,10 @@ class RowIterator(RowIteratorMixin):
 
 
 class ListIterator(RowIteratorMixin):
-    def __init__(self, data, headers=None, hxltags_mapping=None):
+    def __init__(self, data, headers=None):
         self._headers = headers or []
         self._data = data
-        self._hxltags_mapping = hxltags_mapping or {}
         self.reset()
-
-    def hxltags_mapping(self):
-        "Dictionary mapping field names to hxl tags"
-        return self._hxltags_mapping
 
     def reset(self):
         self._iterator = iter(self._data)
@@ -253,17 +213,11 @@ class RowIteratorWithFields(RowIteratorMixin):
         "List of field names of the row iterator"
         return convert_headers(self.rowit.headers(), self._fields)
 
-    def hxltags_mapping(self):
-        mapping = self.rowit.hxltags_mapping()
-        mapping.update(hxltags_mapping(self._fields))
-        return mapping
-
 
 class RowIteratorWithSumField(RowIteratorProxyMixin):
-    def __init__(self, rowit, field_name, hxltag, sum_fields):
+    def __init__(self, rowit, field_name, sum_fields):
         self.rowit = rowit
         self.field_name = field_name
-        self.hxltag = hxltag
         self.sum_fields = sum_fields
 
     def headers(self):
@@ -272,11 +226,6 @@ class RowIteratorWithSumField(RowIteratorProxyMixin):
         if self.field_name not in headers:
             headers.append(self.field_name)
         return headers
-
-    def hxltags_mapping(self):
-        mapping = self.rowit.hxltags_mapping()
-        mapping[self.field_name] = self.hxltag
-        return mapping
 
     def __next__(self):
         row = next(self.rowit)

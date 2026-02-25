@@ -3,7 +3,7 @@
 UNHCR:
 -----
 
-Generates HXlated API urls from the UNHCR data.
+Generates API urls from the UNHCR data.
 
 See: https://github.com/OCHA-DAP/hdx-scraper-unhcr-population
 (formerly): https://github.com/orest-d/hdx-scraper-unhcr-population/tree/master
@@ -58,7 +58,6 @@ IS_ASR = False
 # -----------------------------------------------------------------------------------------------------------------------------------------------------
 def get_countriesdata(download_url, resources, downloader):
     countriesdata = {WORLD: {}}
-    qc_rows = dict()
     countries = set()
     if not download_url.endswith("/"):
         download_url += "/"
@@ -105,41 +104,6 @@ def get_countriesdata(download_url, resources, downloader):
                     countriesdata[WORLD][resource_name] = []
                 countriesdata[countryiso][resource_name].append(row)
                 countriesdata[WORLD][resource_name].append(row)
-                year = row["Year"]
-                origin = row["ISO3CoO"]
-                asylum = row["ISO3CoA"]
-                row_key = f"{year}_{origin}_{asylum}"
-                qc_row = qc_rows.get(row_key, dict())
-                qc_row["Year"] = year
-                qc_row["ISO3CoO"] = origin
-                qc_row["ISO3CoA"] = asylum
-                qc_row["CoO_name"] = Get_Country_Name_From_ISO3_Extended(origin)
-                qc_row["CoA_name"] = Get_Country_Name_From_ISO3_Extended(asylum)
-                # qc_row['CoO_name'] = Country.get_country_name_from_iso3(origin)
-                # qc_row['CoA_name'] = Country.get_country_name_from_iso3(asylum)
-                attributes = list()
-                if countryiso == origin:
-                    attributes.append("outgoing")
-                if countryiso == asylum:
-                    attributes.append("incoming")
-                # Added HST June 2022
-                for attribute in attributes:
-                    for field in [
-                        "Applications",
-                        "REF",
-                        "ASY",
-                        "OIP",
-                        "IDP",
-                        "STA",
-                        "OOC",
-                        "HST",
-                    ]:
-                        value = row.get(field)
-                        if value is None:
-                            continue
-                        qc_field = f"{field}_{attribute}"
-                        qc_row[qc_field] = value
-                qc_rows[row_key] = qc_row
         for country_name_column in country_name_columns:
             headers.insert(3, country_name_column)
         for resource_name in resource_names:
@@ -156,12 +120,12 @@ def get_countriesdata(download_url, resources, downloader):
     countries = [{"iso3": WORLD, "countryname": "World"}] + [
         {"iso3": x[0], "countryname": x[1]} for x in sorted(list(countries))
     ]
-    return countries, all_headers, countriesdata, qc_rows
+    return countries, all_headers, countriesdata
 
 
 # -----------------------------------------------------------------------------------------------------------------------------------------------------
 def generate_dataset_and_showcase(
-    folder, country, countrydata, qc_rows, headers, resources, fields
+    folder, country, countrydata, headers, resources, fields
 ):
     """ """
     countryiso = country["iso3"]
@@ -180,16 +144,19 @@ def generate_dataset_and_showcase(
     dataset.set_subnational(True)
     if countryiso == WORLD:
         dataset.add_other_location("world")
+    # Feb-26 - add exception for STA
+    elif countryiso == "STA":
+        print("Skipping trying to add STA country")
+        return None, None
     else:
         # Check for unknown country names
         try:
             dataset.add_country_location(countryiso)
         except HDXError:
             logger.error(f"{countryname} ({countryiso})  not recognised!")
-            return None, None, None
+            return None, None
 
     tags = [
-        "hxl",
         "refugees",
         "asylum seekers",
         "internally displaced persons-idp",
@@ -197,9 +164,6 @@ def generate_dataset_and_showcase(
         "population",
     ]
     dataset.add_tags(tags)
-
-    # Filter the quick chart data to only include the relevant data for the current country
-    qcRowSubset = SubsetQuickChartData(country, qc_rows)
 
     def process_dates(row):
         year = int(row["Year"])
@@ -239,13 +203,12 @@ def generate_dataset_and_showcase(
             "residing in World", "(Global)"
         )
         rowit = RowIterator(headers[resource_name], resource_rows).with_fields(fields)
-        success, results = dataset.generate_resource_from_iterable(
-            rowit.headers(),
-            rowit,
-            rowit.hxltags_mapping(),
+        success, results = dataset.generate_resource(
             folder,
             filename,
+            rowit,
             resourcedata,
+            rowit.headers(),
             date_function=process_dates,
             encoding="utf-8",
         )
@@ -262,102 +225,7 @@ def generate_dataset_and_showcase(
 
     if len(dataset.get_resources()) == 0:
         logger.error(f"{countryname}  has no data!")
-        return None, None, None
-    bites_disabled = [True, True, True]
-    if countryiso != WORLD:
-        filename = "qc_data.csv"
-        resourcedata = {
-            "name": filename,
-            "description": f"QuickCharts data for {countryname}",
-        }
-
-        rowit = (
-            ListIterator(
-                data=list(qcRowSubset.values()),
-                headers=[
-                    "Year",
-                    "ISO3CoO",
-                    "CoO_name",
-                    "ISO3CoA",
-                    "CoA_name",
-                    "Displaced From",
-                    "Displaced Stateless Within",
-                    "Displaced Stateless From",
-                ],
-            )
-            .auto_headers()
-            .to_list_iterator()
-        )
-        years = sorted(set(rowit.column("Year")))[-10:]  # Last 10 years
-        headers = rowit.headers()
-        rowit = (
-            rowit.select(
-                lambda row, years=years: row.get("Year") in years
-            )  # Restrict data to only last 10 years
-            .with_sum_field(
-                "Displaced From",
-                "#affected+displaced+outgoing",
-                [
-                    x
-                    for x in headers
-                    if x.startswith(("REF", "ASY", "OIP")) and x.endswith("_outgoing")
-                ],
-            )
-            .with_sum_field(
-                "Displaced Stateless Within",
-                "#affected+displaced+stateless+incoming",
-                [
-                    x
-                    for x in headers
-                    if x.startswith(("REF", "ASY", "IDP", "OIP", "STA"))
-                    and x.endswith("_incoming")
-                ],
-            )
-            .with_sum_field(
-                "Displaced Stateless From",
-                "#affected+displaced+stateless+outgoing",
-                [
-                    x
-                    for x in headers
-                    if x.startswith(("REF", "ASY", "IDP", "OIP", "STA"))
-                    and x.endswith("_outgoing")
-                ],
-            )
-            .with_fields(fields)
-        )
-
-        for row in rowit:
-            if (
-                row["Country of Origin Code"] == countryiso
-                and row["Displaced From"] > 0
-            ):
-                bites_disabled[0] = False
-            if row["Year"] != years[-1]:
-                continue
-            if (
-                row["Country of Asylum Code"] == countryiso
-                and row["Displaced Stateless Within"] > 0
-            ):
-                bites_disabled[1] = False
-            if (
-                row["Country of Origin Code"] == countryiso
-                and row["Displaced Stateless From"] > 0
-            ):
-                bites_disabled[2] = False
-
-        rowit.reset()
-        success, results = dataset.generate_resource_from_iterable(
-            rowit.headers(),
-            rowit,
-            rowit.hxltags_mapping(),
-            folder,
-            filename,
-            resourcedata,
-            date_function=process_dates,
-            encoding="utf-8",
-        )
-        if success is False:
-            logger.warning(f"QuickCharts {countryname} - {filename}  has no data!")
+        return None, None
     dataset.set_time_period(earliest_startdate, latest_enddate)
     showcase = Showcase(
         {
@@ -369,42 +237,13 @@ def generate_dataset_and_showcase(
         }
     )
     showcase.add_tags(tags)
-    return dataset, showcase, bites_disabled
-
-
-# -------------------------------------------------------------------------------------------------------------------------------------------------------------------
-def SubsetQuickChartData(country, qc_rows):
-    """
-    Creates a subset of the quick chart data for a specific country.  The subset includes all those rows containing
-    the given country either as the origin or as the country of asylum.
-    """
-    countryISO = country["iso3"]
-    country["countryname"]
-
-    # The new dictionary to store the subset of the data
-    qcRowSubset = dict()
-
-    # If this is the global dataset, return all, otherwise continue to filter by origin and asylum values
-    # This should not be necessary as the call to this function is after the switch on world / non-world, but it makes sense to keep it.
-    if countryISO == WORLD:
-        print("Special case - processing the world")
-        qcRowSubset = qc_rows
-    else:
-        # filter the data by iterating though the values
-        for key, value in qc_rows.items():
-            if value["ISO3CoO"] == countryISO or value["ISO3CoA"] == countryISO:
-                qcRowSubset[key] = value
-
-    print("Filtered ", countryISO, " to ", len(qcRowSubset), " rows")
-
-    return qcRowSubset
+    return dataset, showcase
 
 
 # -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 def Get_Country_Name_From_ISO3_Extended(countryISO):
     """
-    Creates a subset of the quick chart data for a specific country.  The subset includes all those rows containing
-    the given country either as the origin or as the country of asylum.
+    Gets country name from iso3 with UNHCR specific changes
     """
 
     countryName = ""
