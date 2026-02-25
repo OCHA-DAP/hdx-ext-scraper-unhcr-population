@@ -144,13 +144,17 @@ def generate_dataset_and_showcase(
     dataset.set_subnational(True)
     if countryiso == WORLD:
         dataset.add_other_location("world")
+    # Feb-26 - add exception for STA
+    elif countryiso == "STA":
+        print("Skipping trying to add STA country")
+        return None, None
     else:
         # Check for unknown country names
         try:
             dataset.add_country_location(countryiso)
         except HDXError:
             logger.error(f"{countryname} ({countryiso})  not recognised!")
-            return None, None, None
+            return None, None
 
     tags = [
         "refugees",
