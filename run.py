@@ -89,7 +89,6 @@ def main():
                 )  # ensure markdown has line breaks
                 dataset.create_in_hdx(
                     remove_additional_resources=True,
-                    updated_by_script="UNHCR population",
                     batch=info["batch"],
                 )
 
