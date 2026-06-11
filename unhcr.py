@@ -37,8 +37,8 @@ LATEST_YEAR = 2025
 # 2023
 # 2022
 # 2020
-IS_ASR = False
-    #True
+IS_ASR = True #False
+
 
 
 
@@ -47,6 +47,7 @@ IS_ASR = False
 # Latest mid-year data
 
 # Check also we have the latest version of HDX (see the link above)
+# HDX Python API https://github.com/OCHA-DAP/hdx-python-api#a-quick-example
 # and https://pypi.org/project/python-slugify/
 
 # IS_ASR = True

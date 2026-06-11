@@ -107,7 +107,10 @@ def main():
                         name = resource["name"]
                         logger.error(f"{name} is missing!")
                         sys.exit(-1)
-                dataset.reorder_resources(resource_ids, False)
+
+                # Updated for June-2026
+                # dataset.reorder_resources(resource_ids, False)
+                dataset.reorder_resources(resource_ids)
 
                 showcase.create_in_hdx()
                 showcase.add_dataset(dataset)
