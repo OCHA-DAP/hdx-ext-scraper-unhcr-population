@@ -39,7 +39,8 @@ LATEST_YEAR = 2025
 # 2020
 IS_ASR = True #False
 
-
+# Countries without sub-national data (August-2026)  See DataRequests.r for the calculation of this
+NO_SUB_NATIONAL = [ "BMU", "COK", "GIB", "GUM", "LIE", "MAF", "MSR", "NCL", "PRI", "SMR", "SPM", "TUV", "VAT" ]
 
 
 # NOTE - change also the three references to mid/end year in hdx_resource_view_static
@@ -142,7 +143,12 @@ def generate_dataset_and_showcase(
     dataset.set_maintainer("8d70b12b-7247-48d2-b426-dbb4bf82eb7c")
     dataset.set_organization("abf4ca86-8e69-40b1-92f7-71509992be88")
     dataset.set_expected_update_frequency("Every year")
-    dataset.set_subnational(True)
+
+    subnational = not ( countryiso in NO_SUB_NATIONAL)
+    print(f"{countryname} ({countryiso}) has sub-national data: {subnational}.")
+    #dataset.set_subnational(True)
+    dataset.set_subnational(subnational)
+
     if countryiso == WORLD:
         dataset.add_other_location("world")
     # Feb-26 - add exception for STA
